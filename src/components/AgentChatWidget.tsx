@@ -44,7 +44,7 @@ function AgentChatWidget() {
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            void handleSendMessage(e as unknown as React.FormEvent);
+            void handleSendMessage(e);
         }
     };
 

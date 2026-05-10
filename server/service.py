@@ -14,7 +14,10 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     logger.info("Preparing to process chat question")
     question = chat_input.question
 
-    inputs = {"messages": [sys_msg, HumanMessage(content=question)]}
+    inputs = {
+        "messages": [sys_msg, HumanMessage(content=question)],
+        "llm_calls": 0,
+    }
 
     try:
         # Hardcoded to a single thread ID to maintain context across all requests for initial testing.

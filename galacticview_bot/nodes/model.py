@@ -5,6 +5,7 @@ import os
 
 from langchain_core.messages import BaseMessage
 from langchain_groq import ChatGroq
+from pydantic import SecretStr
 
 from loguru import logger
 
@@ -16,7 +17,7 @@ load_dotenv()
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0.7,
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=SecretStr(os.getenv("GROQ_API_KEY", "")),
     max_tokens=1024,   
 )
 

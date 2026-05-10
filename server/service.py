@@ -6,7 +6,6 @@ from loguru import logger
 from langchain_core.messages import HumanMessage
 
 import json
-import uuid
 
 def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     """

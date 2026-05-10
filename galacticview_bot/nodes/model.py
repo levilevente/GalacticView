@@ -5,7 +5,6 @@ import os
 
 from langchain_core.messages import BaseMessage
 from langchain_groq import ChatGroq
-from langchain_core.language_models import BaseChatModel 
 
 from loguru import logger
 

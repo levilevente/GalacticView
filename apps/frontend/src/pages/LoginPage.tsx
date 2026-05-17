@@ -1,25 +1,65 @@
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
-import { Button, Card, Form, InputGroup } from 'react-bootstrap';
+import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+import { auth } from '../config/firebase';
 import style from './LoginRegisterPage.module.css';
 
 function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [error, setError] = useState('');
+
+    const onSubmitHandler = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+
+                const token = await user.getIdToken();
+                const tokenResult = await user.getIdTokenResult();
+
+                localStorage.setItem('token', token);
+                localStorage.setItem('tokenExpire', tokenResult.expirationTime);
+                localStorage.setItem('refreshToken', user.refreshToken);
+            })
+            .catch((error) => {
+                console.error(error);
+                setError('Invalid email or password. Please try again.');
+                setTimeout(() => {
+                    setError('');
+                }, 10000);
+            });
+    };
+
     return (
         <div className={style.pageWrapper}>
             <Card className={style.loginContainer}>
                 <Card.Body>
-                    <Form>
+                    <Form onSubmit={onSubmitHandler}>
                         <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" />
+                            <Form.Control
+                                type="email"
+                                placeholder="Enter email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </Form.Group>
                         <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupPassword">
                             <Form.Label>Password</Form.Label>
                             <InputGroup>
-                                <Form.Control type={showPassword ? 'text' : 'password'} placeholder="Password" />
+                                <Form.Control
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
                                 <Button variant="dark" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </Button>
@@ -37,6 +77,9 @@ function LoginPage() {
                             </Button>
                         </div>
                     </Form>
+                    <Alert variant="danger" className={'mt-3'} style={{ display: error ? 'block' : 'none' }}>
+                        {error}
+                    </Alert>
                 </Card.Body>
             </Card>
         </div>

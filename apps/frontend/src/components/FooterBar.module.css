@@ -1,0 +1,69 @@
+.footerBar {
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 3rem 0;
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    bottom: 0;
+    left: 0;
+    justify-content: space-between;
+}
+
+.firstDiv {
+    margin-left: 10rem;
+    margin-right: 10rem;
+    text-align: left;
+    width: 40rem;
+}
+
+.secondDiv {
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+    margin-right: 10rem;
+    text-align: left;
+}
+
+.logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+/* --------------------------------------------------------- */
+/*     MOBILE NAV FIX (Screen width < 992px)                 */
+/* --------------------------------------------------------- */
+@media (max-width: 992px) {
+    .footerBar {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .firstDiv {
+        margin-left: 2rem;
+        margin-right: 2rem;
+        text-align: left;
+        width: auto;
+    }
+
+    .secondDiv {
+        margin-left: 2rem;
+        margin-right: 2rem;
+        margin-top: 2rem;
+        text-align: left;
+        width: auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .secondDiv {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        justify-content: center;
+    }
+}

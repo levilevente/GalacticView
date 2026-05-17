@@ -1,0 +1,49 @@
+.searchItemContainer {
+    margin-left: 10rem;
+    margin-top: 5rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.leftDiv {
+    flex: 1;
+    margin-right: 2rem;
+}
+
+.rightDiv {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 9rem;
+    position: relative;
+}
+
+.image {
+    width: 80%; /* fill container width */
+    height: auto; /* preserve aspect ratio */
+    max-height: 60rem; /* prevents extreme vertical stretching */
+    object-fit: contain;
+}
+
+/* --------------------------------------------------------- */
+/*     MOBILE & TABLET FIX (Screen width < 992px)            */
+/* --------------------------------------------------------- */
+@media (max-width: 992px) {
+    .searchItemContainer {
+        flex-direction: column;
+        margin-left: 2.8rem;
+        margin-right: 2.8rem;
+        margin-top: 2rem;
+    }
+
+    .leftDiv {
+        margin-right: 0;
+        margin-top: 2rem;
+    }
+
+    .rightDiv {
+        margin-right: 0 !important;
+        position: relative;
+    }
+}

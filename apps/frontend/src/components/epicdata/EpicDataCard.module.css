@@ -1,0 +1,10 @@
+.epicDataCardBody {
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card {
+    width: 18rem;
+}

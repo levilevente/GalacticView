@@ -1,0 +1,76 @@
+{
+  "galacticView": {
+    "title": "GalacticView",
+    "description": "GalacticView is built for space enthusiasts by space enthusiasts. Explore the wonders of the universe with us! You can create blog posts, share your favorite images, and stay updated with the latest space news.",
+    "copyright": "© 2026 GalacticView. All rights reserved."
+  },
+  "navigation": {
+    "epicData": "Epic Data",
+    "imageOfTheDay": "Image of the Day",
+    "blogPost": "Blog Post"
+  },
+  "epicDataPost": {
+    "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",
+    "description": "The stunning \"Blue Marble\" images of the full, sunlit side of Earth are captured daily by the Earth Polychromatic Imaging Camera (EPIC) aboard NOAA's Deep Space Climate Observatory (DSCOVR) satellite. Positioned a million miles away, DSCOVR provides a unique, continuous view of our dynamic planet as it rotates, offering a fresh perspective on weather patterns, clouds, and natural landscapes.",
+    "cameraAndSatelliteTitle": "Camera and Satellite",
+    "cameraAndSatelliteDescription": "The Earth Polychromatic Imaging Camera (EPIC) is the instrument, and it is mounted on the Deep Space Climate Observatory (DSCOVR) satellite.",
+    "locationTitle": "Location",
+    "locationDescription": "The satellite is positioned about a million miles away, between the Earth and the sun, which allows it to capture the entire sunlit side of the planet.",
+    "imageCaptureTitle": "Image Capture",
+    "imageCaptureDescription": "EPIC takes multiple images of Earth's sunlit face each day, with each full-color image being a composite of three separate images.",
+    "card": {
+      "seeMore": "See More",
+      "itemsCount": "items for date",
+      "imageDate": "Images taken: "
+    }
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "footer": {
+    "home": "Home",
+    "explore": "Explore",
+    "blog": "Blog",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "helpCenter": "Help Center",
+    "followUs": "Follow Us",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram"
+  },
+  "imageOfTheDay": {
+    "title": "Image of the Day",
+    "today": "TODAY",
+    "errorImage": "Media type not supported.",
+    "container": {
+      "loading": "Loading...",
+      "failed": "Failed to load image of the day."
+    },
+    "history": {
+      "title": "Search for images from the past",
+      "search": "Search for image"
+    },
+    "searchResults": {
+      "error": "Error FIX IT"
+    }
+  },
+  "agent": {
+    "welcome": "\uD83D\uDC4B How can I help you explore the cosmos today?",
+    "placeholder": "Ask me anything about space..."
+  },
+  "loading": "Loading..."
+}

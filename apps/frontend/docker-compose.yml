@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  galactic-view:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_AGENT_API_BASE_URL=https://localhost:8080
+    ports:
+      - "3000:3000"
+    restart: always

@@ -1,0 +1,66 @@
+name: FRONTEND CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+      - bug/**
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/**
+      - bug/**
+
+jobs:
+  check:
+    name: Validation & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.19.0'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      # 1. ACTUAL TypeScript Check (Crucial for TS projects)
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
+      # 2. Linting
+      - name: Run ESLint
+        run: npx eslint .
+
+      # 3. Formatting
+      - name: Run Prettier
+        run: npx prettier --check .
+
+      # 4. Security Audit
+      - name: Security Audit
+        run: yarn audit --level high
+
+      # 5. Build Test (Ensures the app actually compiles)
+      - name: Build Production Bundle
+        env:
+          VITE_AGENT_API_BASE_URL: ${{ secrets.VITE_AGENT_API_BASE_URL }}
+        run: yarn build
+
+      # 6. Quick Bundle Size Report
+      - name: Check Bundle Size
+        run: ls -lh dist/
+
+      # 7. Upload Artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: galactic-view-build
+          path: dist/
+          retention-days: 1

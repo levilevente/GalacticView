@@ -1,0 +1,58 @@
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10rem;
+}
+
+.datePickerContainer {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.datePickerButton {
+    margin-left: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.datePicker {
+    width: 20rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* --------------------------------------------------------- */
+/*     MOBILE & TABLET FIX (Screen width < 992px)            */
+/* --------------------------------------------------------- */
+@media (max-width: 992px) {
+    .formGroup {
+        margin-left: 2.8rem;
+        margin-right: 2.8rem;
+    }
+
+    .datePicker {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .formGroup {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+
+    .datePickerContainer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .datePickerButton {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}

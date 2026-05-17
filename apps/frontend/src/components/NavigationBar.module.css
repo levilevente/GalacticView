@@ -1,0 +1,99 @@
+.navbarStyle {
+    position: relative;
+    height: 90px;
+    background-color: #000;
+    color: #fff;
+}
+
+.logoStyle {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.brandCentered {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 0;
+}
+
+.navStyle {
+    gap: 1rem;
+}
+
+.navLinkStyle {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.searchForm {
+    margin-right: auto;
+    max-width: 130px;
+    width: 100%;
+    position: relative;
+}
+
+/* --------------------------------------------------------- */
+/*     MOBILE NAV FIX (Screen width < 992px)                 */
+/* --------------------------------------------------------- */
+@media (max-width: 992px) {
+    .gridContainer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        width: 100%;
+    }
+
+    .searchForm {
+        justify-self: start;
+        width: 100%;
+        max-width: 160px;
+        margin: 0;
+    }
+
+    .brandCentered {
+        position: static;
+        transform: none;
+        margin: 0;
+        justify-self: center;
+        padding: 0 10px;
+    }
+
+    :global(.navbar-toggler) {
+        justify-self: end;
+    }
+
+    .navCollapse {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .navbarStyle {
+        height: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    :global(.navbar-toggler) {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    :global(.navbar-toggler-icon) {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+}
+
+@media (max-width: 389px) {
+    .searchForm {
+        max-width: 120px;
+    }
+
+    .logoStyle {
+        width: 30px;
+        height: 30px;
+    }
+}

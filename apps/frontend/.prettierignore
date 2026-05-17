@@ -1,0 +1,7 @@
+# Ignore artifacts:
+build
+coverage
+*.yml
+node_modules
+*.yaml
+*.json

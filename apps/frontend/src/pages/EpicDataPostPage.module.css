@@ -1,0 +1,50 @@
+.image {
+    width: 100%;
+    height: auto;
+    max-height: 60rem !important;
+    object-fit: contain;
+}
+
+.carouselContainer {
+    font-size: 1.5rem;
+    width: 40rem;
+    height: 40rem;
+}
+
+.centerContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.mainContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8rem;
+    padding: 2rem;
+}
+
+.leftContainer {
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
+}
+
+.rightContainer {
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
+    margin-top: 2rem;
+}
+
+.paragraphUnderHeading {
+    margin-top: 1.5rem;
+}
+
+.carouselCaption {
+    bottom: -1rem;
+    margin-bottom: 0.5rem;
+}

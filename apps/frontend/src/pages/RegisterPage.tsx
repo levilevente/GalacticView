@@ -5,7 +5,6 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import style from './LoginRegisterPage.module.css';
 
 function RegisterPage() {
-
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
@@ -34,7 +33,10 @@ function RegisterPage() {
                         <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupRepeatPassword">
                             <Form.Label>Repeat Password</Form.Label>
                             <InputGroup>
-                                <Form.Control type={showRepeatPassword ? 'text' : 'password'} placeholder="Repeat Password" />
+                                <Form.Control
+                                    type={showRepeatPassword ? 'text' : 'password'}
+                                    placeholder="Repeat Password"
+                                />
                                 <Button variant="dark" onClick={() => setShowRepeatPassword(!showRepeatPassword)}>
                                     {showRepeatPassword ? <FaEyeSlash /> : <FaEye />}
                                 </Button>

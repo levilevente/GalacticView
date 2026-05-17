@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Card, Form, InputGroup } from 'react-bootstrap';
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import style from './LoginRegisterPage.module.css';
 

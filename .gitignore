@@ -1,0 +1,31 @@
+# IDE / Editor configurations
+.idea/                 # WebStorm / IntelliJ settings
+.vscode/                # VS Code workspaces
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.idea/*
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Monorepo Environment secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker logs and runtime data
+*.log
+docker-compose.override.yml
+
+# Node & Python global crash dumps
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pytest_cache/
+__pycache__/

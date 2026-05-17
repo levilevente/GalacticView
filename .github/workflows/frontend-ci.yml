@@ -4,29 +4,39 @@ on:
   push:
     branches:
       - main
-      - develop
+      - dev
       - feature/**
       - bug/**
+    paths:
+      - "apps/frontend/**"
   pull_request:
     branches:
       - main
-      - develop
+      - dev
       - feature/**
       - bug/**
+    paths:
+      - "apps/frontend/**"
 
 jobs:
   check:
     name: Validation & Build
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/frontend
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'
-          cache: 'yarn'
+          node-version: "20.19.0"
+          cache: "yarn"
+          cache-dependency-path: apps/frontend/yarn.lock
 
       - name: Install dependencies
         run: yarn install
@@ -62,5 +72,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: galactic-view-build
-          path: dist/
+          path: apps/frontend/dist/
           retention-days: 1

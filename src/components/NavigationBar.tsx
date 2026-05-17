@@ -65,9 +65,9 @@ function NavigationBar() {
                         <Nav.Link href="/imageoftheday" className={style.navLinkStyle}>
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
-                        <Nav.Link href="/blogpost" className={style.navLinkStyle}>
+                        {/*<Nav.Link href="/blogpost" className={style.navLinkStyle}>
                             {t('navigation.blogPost')}
-                        </Nav.Link>
+                        </Nav.Link>*/}
                     </Nav>
                 </Navbar.Collapse>
             </Container>

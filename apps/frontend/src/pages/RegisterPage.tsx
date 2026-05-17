@@ -1,9 +1,8 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { auth } from '../config/firebase';
+import { registerUser } from '../utils/authUtils';
 import style from './LoginRegisterPage.module.css';
 
 function RegisterPage() {
@@ -14,7 +13,7 @@ function RegisterPage() {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [error, setError] = useState('');
 
-    const registerHandler = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const registerHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (password !== repeatPassword) {
@@ -25,31 +24,22 @@ function RegisterPage() {
             return;
         }
 
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(async (userCredential) => {
-                const user = userCredential.user;
-
-                const token = await user.getIdToken();
-                const tokenResult = await user.getIdTokenResult();
-
-                localStorage.setItem('token', token);
-                localStorage.setItem('tokenExpire', tokenResult.expirationTime);
-                localStorage.setItem('refreshToken', user.refreshToken);
-            })
-            .catch((error) => {
-                console.error(error);
-                setError('Passwords do not match. Please try again.');
-                setTimeout(() => {
-                    setError('');
-                }, 10000);
-            });
+        try {
+            await registerUser(email, password);
+        } catch (error) {
+            console.error(error);
+            setError('Error setting up your account. Please try again.');
+            setTimeout(() => {
+                setError('');
+            }, 10000);
+        }
     };
 
     return (
         <div className={style.pageWrapper}>
             <Card className={style.loginContainer}>
                 <Card.Body>
-                    <Form onSubmit={registerHandler}>
+                    <Form onSubmit={(e) => void registerHandler(e)}>
                         <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control

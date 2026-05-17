@@ -1,9 +1,8 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { auth } from '../config/firebase';
+import { loginUser } from '../utils/authUtils';
 import style from './LoginRegisterPage.module.css';
 
 function LoginPage() {
@@ -14,34 +13,25 @@ function LoginPage() {
 
     const [error, setError] = useState('');
 
-    const onSubmitHandler = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const onSubmitHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then(async (userCredential) => {
-                const user = userCredential.user;
-
-                const token = await user.getIdToken();
-                const tokenResult = await user.getIdTokenResult();
-
-                localStorage.setItem('token', token);
-                localStorage.setItem('tokenExpire', tokenResult.expirationTime);
-                localStorage.setItem('refreshToken', user.refreshToken);
-            })
-            .catch((error) => {
-                console.error(error);
-                setError('Invalid email or password. Please try again.');
-                setTimeout(() => {
-                    setError('');
-                }, 10000);
-            });
+        try {
+            await loginUser(email, password);
+        } catch (error) {
+            console.error(error);
+            setError('Invalid email or password. Please try again.');
+            setTimeout(() => {
+                setError('');
+            }, 10000);
+        }
     };
 
     return (
         <div className={style.pageWrapper}>
             <Card className={style.loginContainer}>
                 <Card.Body>
-                    <Form onSubmit={onSubmitHandler}>
+                    <Form onSubmit={(e) => void onSubmitHandler(e)}>
                         <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control

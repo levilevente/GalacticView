@@ -2,11 +2,11 @@ name: BACKEND CI
 
 on:
   push:
-    branches: [main, feature/**]
+    branches: [main, dev, feature/**]
     paths:
       - "apps/backend/**"
   pull_request:
-    branches: [main]
+    branches: [main, dev, feature/**]
     paths:
       - "apps/backend/**"
   workflow_dispatch: {}

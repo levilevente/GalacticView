@@ -4,19 +4,19 @@ on:
   push:
     branches:
       - main
-      - develop
+      - dev
       - feature/**
       - bug/**
     paths:
-      - 'apps/frontend/**'
+      - "apps/frontend/**"
   pull_request:
     branches:
       - main
-      - develop
+      - dev
       - feature/**
       - bug/**
     paths:
-      - 'apps/frontend/**'
+      - "apps/frontend/**"
 
 jobs:
   check:
@@ -34,8 +34,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'
-          cache: 'yarn'
+          node-version: "20.19.0"
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install
@@ -65,7 +65,7 @@ jobs:
       # 6. Quick Bundle Size Report
       - name: Check Bundle Size
         run: ls -lh dist/
-        
+
       # 7. Upload Artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4

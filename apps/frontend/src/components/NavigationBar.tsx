@@ -65,6 +65,9 @@ function NavigationBar() {
                         <Nav.Link href="/imageoftheday" className={style.navLinkStyle}>
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
+                        <Nav.Link href="/login" className={style.navLinkStyle}>
+                            {t('navigation.login')}
+                        </Nav.Link>
                         {/*<Nav.Link href="/blogpost" className={style.navLinkStyle}>
                             {t('navigation.blogPost')}
                         </Nav.Link>*/}

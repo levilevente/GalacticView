@@ -10,6 +10,8 @@ from .service import chat_ask_question
 
 from .dto import ChatTypeIn, ChatTypeOut
 
+from loguru import logger
+
 def get_real_ip(request: Request) -> str:
     """
     Extract the real client IP address from the X-Forwarded-For header if present.
@@ -45,7 +47,9 @@ def chat_endpoint(request: Request, body: ChatTypeIn) -> ChatTypeOut:
     Process chat questions using the agent and return structured responses.
     Rate limited to 7 requests per minute per IP.
     """
+    logger.info("Received request to /chat endpoint")
     response_data: ChatTypeOut = chat_ask_question(body)
+    logger.info("Sending response back to client")
     return response_data
 
 def main() -> None:
@@ -59,6 +63,7 @@ def main() -> None:
     if env == "prod":
         host = "0.0.0.0"
 
+    logger.info(f"Starting server on {host}:8000 with reload={reload}")
     uvicorn.run("server.serve:app", host=host, port=8000, reload=reload)
 
 if __name__ == "__main__":

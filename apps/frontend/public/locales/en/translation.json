@@ -7,7 +7,9 @@
   "navigation": {
     "epicData": "Epic Data",
     "imageOfTheDay": "Image of the Day",
-    "blogPost": "Blog Post"
+    "blogPost": "Blog Post",
+    "login": "Login",
+    "register": "Register"
   },
   "epicDataPost": {
     "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",

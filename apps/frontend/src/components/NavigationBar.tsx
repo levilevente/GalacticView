@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import Nav from 'react-bootstrap/Nav';
@@ -7,6 +7,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { useTranslation } from 'react-i18next';
 
 import { searchNasaLibrary } from '../api/nasaImageAndVideoLibrary.api.ts';
+import { useAuth } from '../context/AuthContext.tsx';
 import type { NasaImageAndVideoLibraryType } from '../types/NasaImageAndVideoLibraryType.ts';
 import style from './NavigationBar.module.css';
 import SearchResults from './search/SearchResults.tsx';
@@ -16,6 +17,9 @@ function NavigationBar() {
 
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<NasaImageAndVideoLibraryType | null>(null);
+
+    const { isAuthenticated, logout } = useAuth();
+
     const [showResults, setShowResults] = useState(false);
 
     const searchHandler = (e: FormEvent<HTMLFormElement>) => {
@@ -65,6 +69,15 @@ function NavigationBar() {
                         <Nav.Link href="/imageoftheday" className={style.navLinkStyle}>
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
+                        {isAuthenticated ? (
+                            <Button variant="light" onClick={() => void logout()}>
+                                Logout
+                            </Button>
+                        ) : (
+                            <Nav.Link href="/login" className={style.navLinkStyle}>
+                                {t('navigation.login')}
+                            </Nav.Link>
+                        )}
                         {/*<Nav.Link href="/blogpost" className={style.navLinkStyle}>
                             {t('navigation.blogPost')}
                         </Nav.Link>*/}

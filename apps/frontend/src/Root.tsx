@@ -9,6 +9,8 @@ import EpicDataPage from './pages/EpicDataPage.tsx';
 import EpicDataPostPage from './pages/EpicDataPostPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import ImageOfTheDayPage from './pages/ImageOfTheDayPage.tsx';
+import LoginPage from './pages/LoginPage.tsx';
+import RegisterPage from './pages/RegisterPage.tsx';
 import SearchItemPage from './pages/SearchItemPage.tsx';
 
 function Root() {
@@ -26,6 +28,8 @@ function Root() {
                             <Route path="/imageoftheday" element={<ImageOfTheDayPage />} />
                             <Route path="/epicdata/:epicDataDate" element={<EpicDataPostPage />} />
                             <Route path="/search/item/:nasaId" element={<SearchItemPage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
                         </Routes>
                     </main>
                     <FooterBar />

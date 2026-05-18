@@ -70,7 +70,9 @@ function NavigationBar() {
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
                         {isAuthenticated ? (
-                            <Button variant="light" onClick={() => void logout()}>Logout</Button>
+                            <Button variant="light" onClick={() => void logout()}>
+                                Logout
+                            </Button>
                         ) : (
                             <Nav.Link href="/login" className={style.navLinkStyle}>
                                 {t('navigation.login')}

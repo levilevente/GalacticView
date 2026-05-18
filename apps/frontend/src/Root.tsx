@@ -27,7 +27,7 @@ function Root() {
                             {/*<Route path="/blogpost" element={<BlogPostPage />} />*/}
                             <Route path="/imageoftheday" element={<ImageOfTheDayPage />} />
                             <Route path="/epicdata/:epicDataDate" element={<EpicDataPostPage />} />
-                            <Route path="/search/item/:nasaId" element={<SearchItemPage />} />                            
+                            <Route path="/search/item/:nasaId" element={<SearchItemPage />} />
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/register" element={<RegisterPage />} />
                         </Routes>

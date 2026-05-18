@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { registerUser } from '../utils/authUtils';
+import { useAuth } from '../context/AuthContext';
 import style from './LoginRegisterPage.module.css';
 
 function RegisterPage() {
@@ -12,6 +12,8 @@ function RegisterPage() {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
     const [error, setError] = useState('');
+
+    const { register } = useAuth();
 
     const registerHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -25,7 +27,7 @@ function RegisterPage() {
         }
 
         try {
-            await registerUser(email, password);
+            await register(email, password);
         } catch (error) {
             console.error(error);
             setError('Error setting up your account. Please try again.');

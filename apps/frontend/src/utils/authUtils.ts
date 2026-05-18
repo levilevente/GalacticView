@@ -1,4 +1,9 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    type UserCredential,
+} from 'firebase/auth';
 
 import { auth } from '../config/firebase';
 
@@ -26,4 +31,15 @@ export const loginUser = async (email: string, password: string) => {
 export const registerUser = async (email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return processAuthTokens(userCredential);
+};
+
+export const logoutUser = async () => {
+    try {
+        await signOut(auth);
+        localStorage.removeItem('token');
+        localStorage.removeItem('tokenExpire');
+        localStorage.removeItem('refreshToken');
+    } catch (error) {
+        console.error('Error signing out:', error);
+    }
 };

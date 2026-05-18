@@ -40,7 +40,7 @@ function RegisterPage() {
             <Card className={style.loginContainer}>
                 <Card.Body>
                     <Form onSubmit={(e) => void registerHandler(e)}>
-                        <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupEmail">
+                        <Form.Group className="mb-3" controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control
                                 type="email"
@@ -49,7 +49,7 @@ function RegisterPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupPassword">
+                        <Form.Group className="mb-3" controlId="formGroupPassword">
                             <Form.Label>Password</Form.Label>
                             <InputGroup>
                                 <Form.Control
@@ -63,7 +63,7 @@ function RegisterPage() {
                                 </Button>
                             </InputGroup>
                         </Form.Group>
-                        <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupRepeatPassword">
+                        <Form.Group className="mb-3" controlId="formGroupRepeatPassword">
                             <Form.Label>Repeat Password</Form.Label>
                             <InputGroup>
                                 <Form.Control

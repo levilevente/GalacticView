@@ -32,7 +32,7 @@ function LoginPage() {
             <Card className={style.loginContainer}>
                 <Card.Body>
                     <Form onSubmit={(e) => void onSubmitHandler(e)}>
-                        <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupEmail">
+                        <Form.Group className="mb-3" controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control
                                 type="email"
@@ -41,7 +41,7 @@ function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group className={`mb-3 ${style.formGroup}`} controlId="formGroupPassword">
+                        <Form.Group className="mb-3" controlId="formGroupPassword">
                             <Form.Label>Password</Form.Label>
                             <InputGroup>
                                 <Form.Control

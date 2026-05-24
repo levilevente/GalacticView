@@ -1,12 +1,12 @@
-import { onAuthStateChanged, type User } from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-import { auth } from '../config/firebase';
+import { getCurrentUser } from '../api/auth.api';
+import type { UserProfile } from '../types/UserType';
 import { loginUser, logoutUser, registerUser } from '../utils/authUtils';
 
 export interface AuthContextType {
     isAuthenticated: boolean;
-    user: User | null;
+    user: UserProfile | null;
     loading: boolean;
     login: typeof loginUser;
     register: typeof registerUser;
@@ -16,23 +16,33 @@ export interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        /*
-            Reads the user information from Firebase's internal IndexedDB 
-        */
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+        try {
+            getCurrentUser()
+                .then((response) => {
+                    if (response.status === 'success' && response.user) {
+                        setUser(response.user as unknown as UserProfile | null);
+                        console.log('User authenticated:', response.user);
+                    }
+                    setLoading(false);
+                })
+                .catch((error) => {
+                    console.error('Error fetching user:', error);
+                    setLoading(false);
+                });
+        } catch (error) {
+            console.error('Error fetching user:', error);
             setLoading(false);
-        });
-        return () => unsubscribe();
+        }
     }, []);
 
     const handleLogout = async () => {
         try {
             await logoutUser();
+            setUser(null);
         } catch (error) {
             console.error('Logout failed:', error);
         }

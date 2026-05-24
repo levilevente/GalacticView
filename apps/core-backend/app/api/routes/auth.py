@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Response, HTTPException
+from fastapi import APIRouter, Response, HTTPException, Depends
 from pydantic import BaseModel
 from firebase_admin import auth
 import firebase_admin
+from app.api.dependencies import get_current_user
+
 
 import datetime
 
@@ -35,3 +37,21 @@ async def verify_token(request: TokenRequest, response: Response):
         raise HTTPException(status_code=401, detail="Invalid ID token")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.post("/logout")
+async def logout(response: Response):
+    """
+      Clear the session cookie to log the user out.
+    """
+    response.delete_cookie(key="session")
+    return {"status": "success", "message": "Logout successful"}
+
+
+@router.get("/me")
+async def get_my_profile(uid: str = Depends(get_current_user)):
+    """
+      Retrieve the current user's information based on the session cookie.
+    """
+
+    return {"status": "success", "message": "User info endpoint - to be implemented", "user": {"id": uid, "email": "user_email@email.com", "username": "user_name", "role": "user"}}

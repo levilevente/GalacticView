@@ -1,7 +1,13 @@
 import axios, { type AxiosError } from 'axios';
-import type { UserCredential } from 'firebase/auth';
+import type { UserCredential, UserProfile } from 'firebase/auth';
 
 import { logoutUser } from '../utils/authUtils';
+
+export interface AuthResponse {
+    status: 'success' | 'error';
+    message: string;
+    user?: UserProfile;
+}
 
 const baseUrl = import.meta.env.VITE_CORE_API_BASE_URL as string;
 if (!baseUrl) {
@@ -23,7 +29,9 @@ coreAPI.interceptors.response.use(
         return response;
     },
     async (error: AxiosError) => {
-        if (error.response?.status === 401) {
+        const originalRequest = error.config;
+        
+        if (error.response?.status === 401 && originalRequest?.url !== '/auth/me') {
             console.warn('Session expired. Logging out...');
             await logoutUser();
             window.location.href = '/login';
@@ -32,10 +40,20 @@ coreAPI.interceptors.response.use(
     },
 );
 
-export async function fetchIdToken(userCredential: UserCredential): Promise<any> {
+export async function fetchIdToken(userCredential: UserCredential): Promise<AuthResponse> {
     const user = userCredential.user;
     const token = await user.getIdToken();
 
-    const res = await coreAPI.post('/auth/login', { id_token: token });
+    const res = await coreAPI.post<AuthResponse>('/auth/login', { id_token: token });
     return res.data;
+}
+
+export async function deleteCookie(): Promise<AuthResponse> {
+    const response = await coreAPI.post<AuthResponse>('/auth/logout');
+    return response.data;
+}
+
+export async function getCurrentUser(): Promise<AuthResponse> {
+    const response = await coreAPI.get<AuthResponse>('/auth/me');
+    return response.data;
 }

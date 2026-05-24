@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         /*
-          Reads the user information from Firebase's internal IndexedDB 
+            Reads the user information from Firebase's internal IndexedDB 
         */
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);

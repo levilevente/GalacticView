@@ -5,22 +5,12 @@ import {
     type UserCredential,
 } from 'firebase/auth';
 
+import { fetchIdToken } from '../api/auth.api';
 import { auth } from '../config/firebase';
 
 const processAuthTokens = async (userCredential: UserCredential) => {
-    const user = userCredential.user;
-
-    const token = await user.getIdToken();
-    const tokenResult = await user.getIdTokenResult();
-
-    //TODO: Handle token expiration and refreshing properly in the future.
-    //      Use server-side sessions or a more secure storage mechanism like HttpOnly cookies to store tokens in a production environment.
-    //      For now, we just store the tokens in localStorage.
-    localStorage.setItem('token', token);
-    localStorage.setItem('tokenExpire', tokenResult.expirationTime);
-    localStorage.setItem('refreshToken', user.refreshToken);
-
-    return user;
+    await fetchIdToken(userCredential);
+    return 'ok';
 };
 
 export const loginUser = async (email: string, password: string) => {

@@ -14,6 +14,7 @@ export const agentApi = axios.create({
         Accept: 'application/json',
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
 export async function sendPromptToAgent(message: string): Promise<AgentDataTypeIn> {

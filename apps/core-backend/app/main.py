@@ -10,6 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from app.api.routes import auth
 from contextlib import asynccontextmanager
 import firebase_admin
+from app.core.database import engine, Base
 
 import uvicorn
 import os
@@ -27,6 +28,8 @@ def get_real_ip(request: Request) -> str:
     return request.client.host # type: ignore
 
 limiter = Limiter(key_func=get_real_ip)
+
+Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

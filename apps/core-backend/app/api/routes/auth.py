@@ -1,43 +1,66 @@
 from fastapi import APIRouter, Response, HTTPException, Depends
 from pydantic import BaseModel
-from firebase_admin import auth
-import firebase_admin
 from app.api.dependencies import get_current_user
+from app.schema.user_schema import RegisterRequest
+from app.repositories.user_repository import UserRepository
+from app.services.auth_service import AuthService
+from sqlalchemy.orm import Session
+from app.database import get_db
 
-
-import datetime
 
 class TokenRequest(BaseModel):
     id_token: str
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/login")
-async def verify_token(request: TokenRequest, response: Response):
+def get_auth_service(db: Session = Depends(get_db)):
     """
-      Verify the provided Firebase ID token and create a session cookie.
-      The session cookie will be set in the response for client-side authentication.
+    DI helper
     """
-    try:
-        expires_in = datetime.timedelta(days=5)
+    repo = UserRepository(db)
+    return AuthService(repo)
 
-        session_cookie = auth.create_session_cookie(request.id_token, expires_in=expires_in)
-
-        response.set_cookie(
-            key = "session",
-            value = session_cookie,
-            max_age=int(expires_in.total_seconds()),
-            httponly = True,
-            secure = False, # TODO: Set to True in production with HTTPS
-            samesite = "lax",
-        )
-
-        return {"status": "success", "message": "Login successful"}
-    except firebase_admin.auth.InvalidIdTokenError:
-        raise HTTPException(status_code=401, detail="Invalid ID token")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/register")
+async def register(
+    request: RegisterRequest, 
+    response: Response, 
+    service: AuthService = Depends(get_auth_service)
+):
+    """
+    1. Verify the username is available in the DB
+    2. Verify with Firebase
+    3. Save to PostgreSQL
+    4. Mint the Session Cookie
+    """
+    cookie_data = service.register_user(request.id_token, request.username)
     
+    response.set_cookie(
+        key="session",
+        value=cookie_data["cookie"],
+        max_age=cookie_data["expires"],
+        httponly=True,
+        samesite="lax",
+        secure=False # True in production
+    )
+    return {"status": "success", "message": "Registered and logged in"}
+
+@router.post("/login")
+async def login(
+    request: TokenRequest, 
+    response: Response, 
+    service: AuthService = Depends(get_auth_service)
+):
+    """
+    Just mint the cookie, the frontend already verified the password.
+    """
+    cookie_data = service.login_user(request.id_token)
+    
+    response.set_cookie(
+        key="session", value=cookie_data["cookie"], max_age=cookie_data["expires"],
+        httponly=True, samesite="lax", secure=False
+    )
+    return {"status": "success", "message": "Login successful"}
+
 
 @router.post("/logout")
 async def logout(response: Response):
@@ -49,9 +72,10 @@ async def logout(response: Response):
 
 
 @router.get("/me")
-async def get_my_profile(uid: str = Depends(get_current_user)):
+async def get_my_profile(uid: str = Depends(get_current_user), db: Session = Depends(get_db)):
     """
       Retrieve the current user's information based on the session cookie.
     """
-
-    return {"status": "success", "message": "User info endpoint - to be implemented", "user": {"id": uid, "email": "user_email@email.com", "username": "user_name", "role": "user"}}
+    repo = UserRepository(db)
+    user = repo.get_user_by_id(uid)
+    return user

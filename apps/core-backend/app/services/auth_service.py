@@ -1,7 +1,7 @@
 import datetime
 from fastapi import HTTPException
 from firebase_admin import auth
-from app.repositories.user_repository import UserRepository
+from app.repositories.user_repo import UserRepository
 
 class AuthService:
     """

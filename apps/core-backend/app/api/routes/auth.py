@@ -2,10 +2,10 @@ from fastapi import APIRouter, Response, HTTPException, Depends
 from pydantic import BaseModel
 from app.api.dependencies import get_current_user
 from app.schema.user_schema import RegisterRequest
-from app.repositories.user_repository import UserRepository
+from app.repositories.user_repo import UserRepository
 from app.services.auth_service import AuthService
 from sqlalchemy.orm import Session
-from app.database import get_db
+from app.api.dependencies import get_db
 
 
 class TokenRequest(BaseModel):

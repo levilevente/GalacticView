@@ -1,10 +1,9 @@
-import { type FormEvent, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { type FormEvent, useRef, useState } from 'react';
+import { Button, Form, Nav, Navbar, Overlay, Popover } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
 import { useTranslation } from 'react-i18next';
+import { CgProfile } from 'react-icons/cg';
 
 import { searchNasaLibrary } from '../api/nasaImageAndVideoLibrary.api.ts';
 import { useAuth } from '../context/AuthContext.tsx';
@@ -13,14 +12,17 @@ import style from './NavigationBar.module.css';
 import SearchResults from './search/SearchResults.tsx';
 
 function NavigationBar() {
-    const { t } = useTranslation();
+    const profileButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<NasaImageAndVideoLibraryType | null>(null);
 
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, logout, user } = useAuth();
 
     const [showResults, setShowResults] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+    const { t } = useTranslation();
 
     const searchHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -39,6 +41,15 @@ function NavigationBar() {
         setShowResults(false);
         setQuery('');
         setResults(null);
+    };
+
+    const handleProfileClick = () => {
+        setShowProfileMenu((current) => !current);
+    };
+
+    const handleLogout = () => {
+        void logout();
+        setShowProfileMenu(false);
     };
 
     return (
@@ -69,18 +80,71 @@ function NavigationBar() {
                         <Nav.Link href="/imageoftheday" className={style.navLinkStyle}>
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
-                        {isAuthenticated ? (
-                            <Button variant="light" onClick={() => void logout()}>
-                                Logout
-                            </Button>
-                        ) : (
-                            <Nav.Link href="/login" className={style.navLinkStyle}>
-                                {t('navigation.login')}
-                            </Nav.Link>
-                        )}
-                        {/*<Nav.Link href="/blogpost" className={style.navLinkStyle}>
-                            {t('navigation.blogPost')}
-                        </Nav.Link>*/}
+                        <Button
+                            ref={profileButtonRef}
+                            variant="none"
+                            className={style.profileButtonStyle}
+                            onClick={handleProfileClick}
+                            aria-label={t('navigation.profile')}
+                            aria-expanded={showProfileMenu}
+                        >
+                            <CgProfile size={24} />
+                        </Button>
+                        <Overlay
+                            target={profileButtonRef.current}
+                            show={showProfileMenu}
+                            placement="bottom-end"
+                            rootClose
+                            onHide={() => setShowProfileMenu(false)}
+                        >
+                            {(overlayProps) => (
+                                <Popover
+                                    id="profile-options-popover"
+                                    className={style.profilePopoverStyle}
+                                    {...overlayProps}
+                                >
+                                    <Popover.Body className={style.profilePopoverBodyStyle}>
+                                        <Nav className="flex-column">
+                                            {!isAuthenticated ? (
+                                                <>
+                                                    <Nav.Link
+                                                        href="/login"
+                                                        className={style.profileMenuItemStyle}
+                                                        onClick={() => setShowProfileMenu(false)}
+                                                    >
+                                                        {t('navigation.login')}
+                                                    </Nav.Link>
+                                                    <Nav.Link
+                                                        href="/register"
+                                                        className={style.profileMenuItemStyle}
+                                                        onClick={() => setShowProfileMenu(false)}
+                                                    >
+                                                        {t('navigation.register')}
+                                                    </Nav.Link>
+                                                </>
+                                            ) : null}
+                                            {isAuthenticated ? (
+                                                <>
+                                                    <div className={style.profileMenuInfoStyle}>
+                                                        <p>
+                                                            {t('navigation.loggedInAs')} {user?.username}
+                                                        </p>
+                                                        <div className={style.profileMenuDividerStyle} />
+                                                    </div>
+                                                    <Button
+                                                        variant="light"
+                                                        className={style.profileMenuItemStyle}
+                                                        onClick={handleLogout}
+                                                    >
+                                                        {t('navigation.logout')}
+                                                    </Button>
+                                                </>
+                                            ) : null}
+                                        </Nav>
+                                    </Popover.Body>
+                                </Popover>
+                            )}
+                        </Overlay>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

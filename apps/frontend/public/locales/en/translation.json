@@ -9,7 +9,11 @@
     "imageOfTheDay": "Image of the Day",
     "blogPost": "Blog Post",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "logout": "Logout",
+    "loggedInAs": "Logged in as",
+    "profile": "Profile",
+    "settings": "Settings"
   },
   "epicDataPost": {
     "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",

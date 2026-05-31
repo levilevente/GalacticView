@@ -129,7 +129,7 @@ function NavigationBar() {
                                                         <p>
                                                             {t('navigation.loggedInAs')} {user?.username}
                                                         </p>
-                                                        <div className={style.profileMenuDividerStyle}/>
+                                                        <div className={style.profileMenuDividerStyle} />
                                                     </div>
                                                     <Button
                                                         variant="light"

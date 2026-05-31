@@ -85,7 +85,7 @@ function NavigationBar() {
                             variant="none"
                             className={style.profileButtonStyle}
                             onClick={handleProfileClick}
-                            aria-label="Profile options"
+                            aria-label={t('navigation.profile')}
                             aria-expanded={showProfileMenu}
                         >
                             <CgProfile size={24} />

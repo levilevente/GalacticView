@@ -4,7 +4,6 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { useAuth } from '../context/AuthContext';
 import style from './LoginRegisterPage.module.css';
-import { registerUser } from '../utils/authUtils';
 
 function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +33,7 @@ function RegisterPage() {
             await register(email, password, username, firstName, lastName);
         } catch (error) {
             console.error(error);
-            setError('Error setting up your account. Please try again.');
+            setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
             setTimeout(() => {
                 setError('');
             }, 10000);

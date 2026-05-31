@@ -1,7 +1,8 @@
 import axios, { type AxiosError } from 'axios';
 import type { UserCredential, UserProfile } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 
-import { logoutUser } from '../utils/authUtils';
+import { auth } from '../config/firebase';
 
 export interface AuthResponse {
     status: 'success' | 'error';
@@ -25,7 +26,6 @@ export const coreAPI = axios.create({
 
 coreAPI.interceptors.response.use(
     (response) => {
-        // If the response is successful, just return it
         return response;
     },
     async (error: AxiosError) => {
@@ -33,7 +33,16 @@ coreAPI.interceptors.response.use(
 
         if (error.response?.status === 401 && originalRequest?.url !== '/auth/me') {
             console.warn('Session expired. Logging out...');
-            await logoutUser();
+            try {
+                await coreAPI.post('/auth/logout');
+            } catch (e) {
+                console.warn('Failed clearing server session:', e);
+            }
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.warn('Failed signing out firebase:', e);
+            }
             window.location.href = '/login';
         }
         return Promise.reject(error);

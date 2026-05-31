@@ -1,9 +1,5 @@
 import { AxiosError } from 'axios';
 import { FirebaseError } from 'firebase/app';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-
-import { deleteCookie, sendLoginRequest, sendRegisterRequest } from '../api/auth.api';
-import { auth } from '../config/firebase';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
     if (error instanceof AxiosError) {
@@ -26,35 +22,4 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
     return fallback;
 };
 
-export const loginUser = async (email: string, password: string) => {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return sendLoginRequest(userCredential);
-};
-
-export const registerUser = async (
-    email: string,
-    password: string,
-    username: string,
-    firstName: string,
-    lastName: string,
-) => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await sendRegisterRequest(userCredential, username, firstName, lastName);
-    } catch (error) {
-        console.error('Error during registration:', error);
-        if (auth.currentUser) {
-            await auth.currentUser.delete();
-        }
-        throw new Error(getApiErrorMessage(error, 'Registration failed. Please try again.'));
-    }
-};
-
-export const logoutUser = async () => {
-    try {
-        await deleteCookie();
-        await signOut(auth);
-    } catch (error) {
-        console.error('Error signing out:', error);
-    }
-};
+export { getApiErrorMessage };

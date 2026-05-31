@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
 import style from './LoginRegisterPage.module.css';
@@ -15,6 +16,8 @@ function RegisterPage() {
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
+
+    const navigate = useNavigate();
 
     const { register } = useAuth();
 
@@ -31,6 +34,7 @@ function RegisterPage() {
 
         try {
             await register(email, password, username, firstName, lastName);
+            await navigate('/');
         } catch (error) {
             console.error(error);
             setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');

@@ -1,16 +1,19 @@
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-import { getCurrentUser } from '../api/auth.api';
+import { deleteCookie, getCurrentUser, sendLoginRequest, sendRegisterRequest } from '../api/auth.api';
+import { auth } from '../config/firebase';
 import type { UserProfile } from '../types/UserType';
-import { loginUser, logoutUser, registerUser } from '../utils/authUtils';
+import { getApiErrorMessage } from '../utils/authUtils';
 
 export interface AuthContextType {
     isAuthenticated: boolean;
     user: UserProfile | null;
     loading: boolean;
-    login: typeof loginUser;
-    register: typeof registerUser;
-    logout: typeof logoutUser;
+    login: (email: string, password: string) => Promise<any>;
+    register: (email: string, password: string, username: string, firstName: string, lastName: string) => Promise<any>;
+    logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -20,27 +23,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        try {
-            getCurrentUser()
-                .then((response) => {
-                    if (response.status === 'success' && response.user) {
-                        setUser(response.user as unknown as UserProfile | null);
-                    }
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.warn('Error fetching user:', error);
-                    setLoading(false);
-                });
-        } catch (error) {
-            console.error('Error fetching user:', error);
-            setLoading(false);
-        }
+        const initAuth = async () => {
+            try {
+                await refreshUser();
+            } catch (error) {
+                console.warn('Initial auth hydration failed', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initAuth().catch((err) => console.error('Unhandled hydration error', err));
     }, []);
+
+    const refreshUser = async () => {
+        try {
+            const response = await getCurrentUser();
+            if (response.status === 'success' && response.user) {
+                setUser(response.user as unknown as UserProfile | null);
+            } else {
+                setUser(null);
+            }
+        } catch (error) {
+            console.error('Error refreshing user:', error);
+            setUser(null);
+        }
+    };
+
+    const handleLogin: AuthContextType['login'] = async (email, password) => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const res = await sendLoginRequest(userCredential);
+            await refreshUser();
+            return res;
+        } catch (error) {
+            throw new Error(getApiErrorMessage(error, 'Login failed.'));
+        }
+    };
+
+    const handleRegister: AuthContextType['register'] = async (email, password, username, firstName, lastName) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const res = await sendRegisterRequest(userCredential, username, firstName, lastName);
+            await refreshUser();
+            return res;
+        } catch (error) {
+            console.error('Error during registration:', error);
+            if (auth.currentUser) {
+                try {
+                    await auth.currentUser.delete();
+                } catch (e) {
+                    console.warn('Failed deleting partially created firebase user:', e);
+                }
+            }
+            throw new Error(getApiErrorMessage(error, 'Registration failed. Please try again.'));
+        }
+    };
 
     const handleLogout = async () => {
         try {
-            await logoutUser();
+            try {
+                await deleteCookie();
+            } catch (err) {
+                console.warn('Failed clearing server session during logout:', err);
+            }
+            try {
+                await signOut(auth);
+            } catch (err) {
+                console.warn('Failed signing out firebase during logout:', err);
+            }
             setUser(null);
         } catch (error) {
             console.error('Logout failed:', error);
@@ -53,9 +104,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 isAuthenticated: !!user,
                 user,
                 loading,
-                login: loginUser,
-                register: registerUser,
+                login: handleLogin,
+                register: handleRegister,
                 logout: handleLogout,
+                refreshUser,
             }}
         >
             {!loading ? children : null}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
 import style from './LoginRegisterPage.module.css';
@@ -10,6 +11,7 @@ function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     const { login } = useAuth();
 
     const onSubmitHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -17,6 +19,7 @@ function LoginPage() {
 
         try {
             await login(email, password);
+            await navigate('/');
         } catch (error) {
             console.error(error);
             setError('Invalid email or password. Please try again.');

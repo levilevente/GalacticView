@@ -30,7 +30,7 @@ coreAPI.interceptors.response.use(
     },
     async (error: AxiosError) => {
         const originalRequest = error.config;
-        
+
         if (error.response?.status === 401 && originalRequest?.url !== '/auth/me') {
             console.warn('Session expired. Logging out...');
             await logoutUser();
@@ -40,11 +40,29 @@ coreAPI.interceptors.response.use(
     },
 );
 
-export async function fetchIdToken(userCredential: UserCredential): Promise<AuthResponse> {
+export async function sendLoginRequest(userCredential: UserCredential): Promise<AuthResponse> {
     const user = userCredential.user;
     const token = await user.getIdToken();
 
     const res = await coreAPI.post<AuthResponse>('/auth/login', { id_token: token });
+    return res.data;
+}
+
+export async function sendRegisterRequest(
+    userCredential: UserCredential,
+    username: string,
+    firstName: string,
+    lastName: string,
+): Promise<AuthResponse> {
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    const res = await coreAPI.post<AuthResponse>('/auth/register', {
+        id_token: token,
+        username: username,
+        first_name: firstName,
+        last_name: lastName,
+    });
     return res.data;
 }
 

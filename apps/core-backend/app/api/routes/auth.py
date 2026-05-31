@@ -32,7 +32,7 @@ async def register(
     3. Save to PostgreSQL
     4. Mint the Session Cookie
     """
-    cookie_data = service.register_user(request.id_token, request.username)
+    cookie_data = service.register_user(request.id_token, request.username, request.first_name, request.last_name)
     
     response.set_cookie(
         key="session",
@@ -65,17 +65,19 @@ async def login(
 @router.post("/logout")
 async def logout(response: Response):
     """
-      Clear the session cookie to log the user out.
+    Clear the session cookie to log the user out.
     """
     response.delete_cookie(key="session")
     return {"status": "success", "message": "Logout successful"}
 
 
 @router.get("/me")
-async def get_my_profile(uid: str = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_my_profile(
+    uid: str = Depends(get_current_user),
+    service: AuthService = Depends(get_auth_service)
+):
     """
-      Retrieve the current user's information based on the session cookie.
+    Retrieve the current user's information based on the session cookie.
     """
-    repo = UserRepository(db)
-    user = repo.get_user_by_id(uid)
-    return user
+    user = service.get_user_by_id(uid)
+    return { "status": "success", "message": "User retrieved", "user": user }

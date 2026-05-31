@@ -2,14 +2,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    height: 70vh;
 }
 
 .loginContainer {
     width: 40vw;
     min-width: 400px;
     height: auto;
-    margin-top: 8vh;
+    margin-top: 3vh;
 }
 
 .buttonContainer {

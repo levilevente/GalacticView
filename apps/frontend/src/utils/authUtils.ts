@@ -2,25 +2,25 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    type UserCredential,
 } from 'firebase/auth';
 
-import { deleteCookie, fetchIdToken } from '../api/auth.api';
+import { deleteCookie, sendLoginRequest, sendRegisterRequest } from '../api/auth.api';
 import { auth } from '../config/firebase';
-
-const processAuthTokens = async (userCredential: UserCredential) => {
-    const response = await fetchIdToken(userCredential);
-    return response;
-};
 
 export const loginUser = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return processAuthTokens(userCredential);
+    return sendLoginRequest(userCredential);
 };
 
-export const registerUser = async (email: string, password: string) => {
+export const registerUser = async (
+    email: string,
+    password: string,
+    username: string,
+    firstName: string,
+    lastName: string,
+) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return processAuthTokens(userCredential);
+    return sendRegisterRequest(userCredential, username, firstName, lastName);
 };
 
 export const logoutUser = async () => {

@@ -10,7 +10,7 @@ class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def register_user(self, id_token: str, username: str):
+    def register_user(self, id_token: str, username: str, first_name: str, last_name: str):
         """
         1. Verify the username is available in the DB
         2. Verify with Firebase
@@ -30,7 +30,9 @@ class AuthService:
 
         existing_user = self.user_repo.get_user_by_id(uid)
         if not existing_user:
-            self.user_repo.create_user(uid=uid, email=email, username=username)
+            self.user_repo.create_user(uid=uid, email=email, username=username, first_name=first_name, last_name=last_name)
+        else:
+            raise HTTPException(status_code=400, detail="User already exists")
 
         return self._create_cookie(id_token)
 
@@ -39,6 +41,16 @@ class AuthService:
         Creates cookie on login
         """
         return self._create_cookie(id_token)
+    
+    def get_user_by_id(self, user_id: str):
+        """
+        Retrieve a user by their unique ID (Firebase UID).
+        """
+        user = self.user_repo.get_user_by_id(user_id)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
 
     def _create_cookie(self, id_token: str) -> dict:
         """

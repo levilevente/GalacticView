@@ -25,12 +25,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .then((response) => {
                     if (response.status === 'success' && response.user) {
                         setUser(response.user as unknown as UserProfile | null);
-                        console.log('User authenticated:', response.user);
                     }
                     setLoading(false);
                 })
                 .catch((error) => {
-                    console.error('Error fetching user:', error);
+                    console.warn('Error fetching user:', error);
                     setLoading(false);
                 });
         } catch (error) {

@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await getCurrentUser();
             if (response.status === 'success' && response.user) {
-                setUser(response.user as unknown as UserProfile | null);
+                setUser(response.user);
             } else {
                 setUser(null);
             }

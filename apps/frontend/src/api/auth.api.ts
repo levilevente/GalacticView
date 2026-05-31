@@ -1,8 +1,9 @@
 import axios, { type AxiosError } from 'axios';
-import type { UserCredential, UserProfile } from 'firebase/auth';
+import type { UserCredential } from 'firebase/auth';
 import { signOut } from 'firebase/auth';
 
 import { auth } from '../config/firebase';
+import type { UserProfile } from '../types/UserType';
 
 export interface AuthResponse {
     status: 'success' | 'error';

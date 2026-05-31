@@ -13,7 +13,6 @@ import firebase_admin
 from app.core.database import engine, Base
 
 import uvicorn
-import os
 
 
 def get_real_ip(request: Request) -> str:

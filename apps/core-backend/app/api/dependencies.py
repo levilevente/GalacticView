@@ -14,12 +14,14 @@ async def get_current_user(request: Request) -> str:
     try:
         decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
         return decoded_claims['uid']
-    
+
     except auth.InvalidSessionCookieError:
         raise HTTPException(status_code=401, detail="Invalid session cookie")
     except auth.RevokedSessionCookieError:
         raise HTTPException(status_code=401, detail="Session cookie revoked")
-    
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid session cookie")
+
 def get_db():
     """
     Dependency that creates a new PostgreSQL session per HTTP request 

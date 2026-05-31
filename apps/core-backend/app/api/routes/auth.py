@@ -6,6 +6,7 @@ from app.repositories.user_repo import UserRepository
 from app.services.auth_service import AuthService
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_db
+from fastapi.encoders import jsonable_encoder
 
 
 class TokenRequest(BaseModel):
@@ -80,4 +81,4 @@ async def get_my_profile(
     Retrieve the current user's information based on the session cookie.
     """
     user = service.get_user_by_id(uid)
-    return { "status": "success", "message": "User retrieved", "user": user }
+    return { "status": "success", "message": "User retrieved", "user": jsonable_encoder(user) }

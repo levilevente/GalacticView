@@ -31,4 +31,4 @@ class UserResponse(BaseModel):
         """
         Pydantic configuration to enable ORM mode, allowing it to work with SQLAlchemy models.
         """
-        orm_mode = True
+        from_attributes = True

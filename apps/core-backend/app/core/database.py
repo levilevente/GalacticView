@@ -2,10 +2,12 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-
 DATABASE_PASSWORD = os.getenv("POSTGRESQL_PASSWORD")
 DATABASE_USER = os.getenv("POSTGRESQL_USER")
 DATABASE_HOST = os.getenv("POSTGRESQL_HOST")
+
+if not all([DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST]):
+    raise RuntimeError("POSTGRESQL_USER, POSTGRESQL_PASSWORD, and POSTGRESQL_HOST must be set")
 
 DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}/galacticview"
 

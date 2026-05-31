@@ -1,45 +1,29 @@
-import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    type UserCredential,
-} from 'firebase/auth';
+import { AxiosError } from 'axios';
+import { FirebaseError } from 'firebase/app';
 
-import { auth } from '../config/firebase';
-
-const processAuthTokens = async (userCredential: UserCredential) => {
-    const user = userCredential.user;
-
-    const token = await user.getIdToken();
-    const tokenResult = await user.getIdTokenResult();
-
-    //TODO: Handle token expiration and refreshing properly in the future.
-    //      Use server-side sessions or a more secure storage mechanism like HttpOnly cookies to store tokens in a production environment.
-    //      For now, we just store the tokens in localStorage.
-    localStorage.setItem('token', token);
-    localStorage.setItem('tokenExpire', tokenResult.expirationTime);
-    localStorage.setItem('refreshToken', user.refreshToken);
-
-    return user;
-};
-
-export const loginUser = async (email: string, password: string) => {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return processAuthTokens(userCredential);
-};
-
-export const registerUser = async (email: string, password: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return processAuthTokens(userCredential);
-};
-
-export const logoutUser = async () => {
-    try {
-        await signOut(auth);
-        localStorage.removeItem('token');
-        localStorage.removeItem('tokenExpire');
-        localStorage.removeItem('refreshToken');
-    } catch (error) {
-        console.error('Error signing out:', error);
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof AxiosError) {
+        return (error.response?.data as { detail?: string } | undefined)?.detail ?? error.message ?? fallback;
     }
+
+    if (error instanceof FirebaseError) {
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                return 'This email is already registered. Please log in or use a different email.';
+            case 'auth/user-not-found':
+                return 'No account found with this email. Please check your email or register for a new account.';
+            case 'auth/wrong-password':
+                return 'Incorrect password. Please try again.';
+            case 'auth/invalid-credential':
+                return 'Invalid credentials. Please try again.';
+            case 'auth/weak-password':
+                return 'Password is too weak. Please choose a stronger password.';
+            default:
+                return error.message ?? fallback;
+        }
+    }
+
+    return fallback;
 };
+
+export { getApiErrorMessage };

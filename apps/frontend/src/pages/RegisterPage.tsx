@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
 import style from './LoginRegisterPage.module.css';
@@ -11,7 +12,12 @@ function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [username, setUsername] = useState('');
     const [error, setError] = useState('');
+
+    const navigate = useNavigate();
 
     const { register } = useAuth();
 
@@ -27,10 +33,11 @@ function RegisterPage() {
         }
 
         try {
-            await register(email, password);
+            await register(email, password, username, firstName, lastName);
+            await navigate('/');
         } catch (error) {
             console.error(error);
-            setError('Error setting up your account. Please try again.');
+            setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
             setTimeout(() => {
                 setError('');
             }, 10000);
@@ -42,6 +49,39 @@ function RegisterPage() {
             <Card className={style.loginContainer}>
                 <Card.Body>
                     <Form onSubmit={(e) => void registerHandler(e)}>
+                        <Form.Group className="mb-3" controlId="formGroupFirstName">
+                            <Form.Label>First Name</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="First Name"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formGroupLastName">
+                            <Form.Label>Last Name</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Last Name"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formGroupUsername">
+                            <Form.Label>Username</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </InputGroup>
+                        </Form.Group>
                         <Form.Group className="mb-3" controlId="formGroupEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control

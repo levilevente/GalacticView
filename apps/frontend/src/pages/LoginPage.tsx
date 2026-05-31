@@ -22,7 +22,7 @@ function LoginPage() {
             await navigate('/');
         } catch (error) {
             console.error(error);
-            setError('Invalid email or password. Please try again.');
+            setError(error instanceof Error ? error.message : 'Login failed. Please try again.');
             setTimeout(() => {
                 setError('');
             }, 10000);

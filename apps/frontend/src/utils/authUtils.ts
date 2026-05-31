@@ -14,6 +14,10 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
                 return 'No account found with this email. Please check your email or register for a new account.';
             case 'auth/wrong-password':
                 return 'Incorrect password. Please try again.';
+            case 'auth/invalid-credential':
+                return 'Invalid credentials. Please try again.';
+            case 'auth/weak-password':
+                return 'Password is too weak. Please choose a stronger password.';
             default:
                 return error.message ?? fallback;
         }

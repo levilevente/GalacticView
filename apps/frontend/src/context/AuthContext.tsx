@@ -10,8 +10,8 @@ export interface AuthContextType {
     isAuthenticated: boolean;
     user: UserProfile | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<any>;
-    register: (email: string, password: string, username: string, firstName: string, lastName: string) => Promise<any>;
+    login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, username: string, firstName: string, lastName: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -53,9 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleLogin: AuthContextType['login'] = async (email, password) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const res = await sendLoginRequest(userCredential);
+            await sendLoginRequest(userCredential);
             await refreshUser();
-            return res;
         } catch (error) {
             throw new Error(getApiErrorMessage(error, 'Login failed.'));
         }
@@ -64,9 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleRegister: AuthContextType['register'] = async (email, password, username, firstName, lastName) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const res = await sendRegisterRequest(userCredential, username, firstName, lastName);
+            await sendRegisterRequest(userCredential, username, firstName, lastName);
             await refreshUser();
-            return res;
         } catch (error) {
             console.error('Error during registration:', error);
             if (auth.currentUser) {

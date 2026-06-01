@@ -1,0 +1,210 @@
+import React, { useState } from 'react';
+import { Alert, Button, Card, Container, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
+import { createBlogPosts } from '../api/blogposts.api.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import type { BlogPostTypeOut } from '../types/BlogPostsType.ts';
+import style from './BlogPostPageCreate.module.css';
+
+function BlogPostPageCreate() {
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { isAuthenticated } = useAuth();
+
+    const [formData, setFormData] = useState<BlogPostTypeOut>({
+        title: '',
+        content: '',
+        image_urls: [],
+        author_id: '',
+    });
+
+    const [currentImageUrl, setCurrentImageUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
+
+    if (!isAuthenticated) {
+        void navigate('/login');
+        return null;
+    }
+
+    const handleAddImageUrl = () => {
+        if (currentImageUrl.trim()) {
+            setFormData((prev) => ({
+                ...prev,
+                image_urls: [...prev.image_urls, currentImageUrl.trim()],
+            }));
+            setCurrentImageUrl('');
+        }
+    };
+
+    const handleRemoveImageUrl = (index: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            image_urls: prev.image_urls.filter((_, i) => i !== index),
+        }));
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError(null);
+        setSuccess(false);
+
+        if (!formData.title.trim()) {
+            setError(t('blogPostCreate.errors.titleRequired'));
+            return;
+        }
+
+        if (!formData.content.trim()) {
+            setError(t('blogPostCreate.errors.contentRequired'));
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            await createBlogPosts(formData);
+            setSuccess(true);
+            setTimeout(() => {
+                void navigate('/blogpost');
+            }, 1500);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : t('blogPostCreate.errors.createFailed');
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className={style.pageWrapper}>
+            <Container className="py-4 py-lg-5">
+                <Card className={style.formCard}>
+                    <Card.Body>
+                        <Card.Title className={style.formTitle}>{t('blogPostCreate.title')}</Card.Title>
+
+                        {error ? (
+                            <Alert variant="danger" className="mb-4">
+                                {error}
+                            </Alert>
+                        ) : null}
+
+                        {success ? (
+                            <Alert variant="success" className="mb-4">
+                                {t('blogPostCreate.successMessage')}
+                            </Alert>
+                        ) : null}
+
+                        <Form onSubmit={(e) => void handleSubmit(e)}>
+                            <Form.Group className="mb-4" controlId="formTitle">
+                                <Form.Label>{t('blogPostCreate.titleLabel')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="title"
+                                    placeholder={t('blogPostCreate.titlePlaceholder')}
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    disabled={isLoading}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-4" controlId="formContent">
+                                <Form.Label>{t('blogPostCreate.contentLabel')}</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    name="content"
+                                    placeholder={t('blogPostCreate.contentPlaceholder')}
+                                    rows={8}
+                                    value={formData.content}
+                                    onChange={handleInputChange}
+                                    disabled={isLoading}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-4" controlId="formAuthorId">
+                                <Form.Label>{t('blogPostCreate.authorIdLabel')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="author_id"
+                                    placeholder={t('blogPostCreate.authorIdPlaceholder')}
+                                    value={formData.author_id}
+                                    onChange={handleInputChange}
+                                    disabled={isLoading}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-4" controlId="formImageUrls">
+                                <Form.Label>{t('blogPostCreate.imageUrlsLabel')}</Form.Label>
+
+                                <div className="d-flex gap-2 mb-3">
+                                    <Form.Control
+                                        type="url"
+                                        placeholder={t('blogPostCreate.imageUrlPlaceholder')}
+                                        value={currentImageUrl}
+                                        onChange={(e) => setCurrentImageUrl(e.target.value)}
+                                        disabled={isLoading}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                handleAddImageUrl();
+                                            }
+                                        }}
+                                    />
+                                    <Button
+                                        variant="outline-dark"
+                                        onClick={handleAddImageUrl}
+                                        disabled={!currentImageUrl.trim() || isLoading}
+                                    >
+                                        {t('blogPostCreate.addImageButton')}
+                                    </Button>
+                                </div>
+
+                                {formData.image_urls.length > 0 ? (
+                                    <div className={style.imageUrlsList}>
+                                        {formData.image_urls.map((url, index) => (
+                                            <div key={index} className={style.imageUrlItem}>
+                                                <span className={style.imageUrlText}>{url}</span>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleRemoveImageUrl(index)}
+                                                    disabled={isLoading}
+                                                >
+                                                    {t('blogPostCreate.removeButton')}
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : null}
+                            </Form.Group>
+
+                            <div className={style.formActions}>
+                                <Button variant="dark" type="submit" disabled={isLoading}>
+                                    {isLoading ? t('blogPostCreate.saving') : t('blogPostCreate.publishButton')}
+                                </Button>
+                                <Button
+                                    variant="outline-dark"
+                                    onClick={() => void navigate('/blogpost')}
+                                    disabled={isLoading}
+                                >
+                                    {t('blogPostCreate.cancelButton')}
+                                </Button>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
+            </Container>
+        </div>
+    );
+}
+
+export default BlogPostPageCreate;

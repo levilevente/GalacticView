@@ -26,6 +26,28 @@
       "unknown": "Unknown error"
     }
   },
+  "blogPostCreate": {
+    "title": "Create a New Blog Post",
+    "titleLabel": "Post Title",
+    "titlePlaceholder": "Enter your post title",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Write your blog post content here...",
+    "authorIdLabel": "Author ID (Optional)",
+    "authorIdPlaceholder": "Your author ID or username",
+    "imageUrlsLabel": "Image URLs",
+    "imageUrlPlaceholder": "Enter an image URL",
+    "addImageButton": "Add Image",
+    "removeButton": "Remove",
+    "publishButton": "Publish",
+    "cancelButton": "Cancel",
+    "saving": "Publishing...",
+    "successMessage": "Blog post published successfully! Redirecting...",
+    "errors": {
+      "titleRequired": "Please enter a post title.",
+      "contentRequired": "Please enter post content.",
+      "createFailed": "Failed to create blog post. Please try again."
+    }
+  },
   "epicDataPost": {
     "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",
     "description": "The stunning \"Blue Marble\" images of the full, sunlit side of Earth are captured daily by the Earth Polychromatic Imaging Camera (EPIC) aboard NOAA's Deep Space Climate Observatory (DSCOVR) satellite. Positioned a million miles away, DSCOVR provides a unique, continuous view of our dynamic planet as it rotates, offering a fresh perspective on weather patterns, clouds, and natural landscapes.",

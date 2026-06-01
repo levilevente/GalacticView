@@ -1,58 +1,42 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-import uvicorn
-
+# app/main.py
 import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
-def get_real_ip(request: Request) -> str:
-    """
-    Extract the real client IP address from the X-Forwarded-For header if present.
-    WARNING: Only trust this header if set by a trusted proxy to prevent IP spoofing.
-    """
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        # take the first IP in the list (the original client)
-        return forwarded.split(",")[0].strip()
-    return request.client.host # type: ignore
+from app.api.routes import blogs
+from app.core.aws import dynamodb
 
-limiter = Limiter(key_func=get_real_ip)
+load_dotenv()
 
-app = FastAPI()
+app = FastAPI(title="GalacticView Blog Content Service")
 
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # type: ignore
+ALLOWED_ORIGINS = [o.strip() 
+                    for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS, 
+    allow_credentials=True,                  
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.get("/health")
-def health_check() -> dict:
+@app.get("/health", tags=["System"])
+def health_check():
     """
-    Health check endpoint to verify that the server is running.
+    Kubernetes will use this endpoint to check if the service is alive and healthy.
     """
-    return {"status": "ok"}
+    try:
+        dynamodb.meta.client.list_tables(Limit=1)
+        db_status = "connected"
+    except Exception:
+        db_status = "disconnected"
 
-def main() -> None:
-    """
-    Main function to run the FastAPI app using Uvicorn.
-    """
-    env = os.getenv("ENVIRONMENT", "prod")
+    return {
+        "status": "healthy", 
+        "database": db_status,
+        "service": "blog-content"
+    }
 
-    reload = env == "dev"
-    host = "127.0.0.1"
-    if env == "prod":
-        host = "0.0.0.0"
-
-    print(f"Starting server on {host}:8000 with reload={reload}")
-    uvicorn.run("app.main:app", host=host, port=8000, reload=reload)
-
-if __name__ == "__main__":
-    main()
+app.include_router(blogs.router)

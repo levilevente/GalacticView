@@ -7,13 +7,24 @@
   "navigation": {
     "epicData": "Epic Data",
     "imageOfTheDay": "Image of the Day",
-    "blogPost": "Blog Post",
+    "blogPosts": "Blog Posts",
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
     "loggedInAs": "Logged in as",
     "profile": "Profile",
     "settings": "Settings"
+  },
+  "blogPosts": {
+    "feedTitle": "Feed",
+    "createPost": "Create post",
+    "badge": "Blog post",
+    "empty": "No blog posts are available yet.",
+    "defaultAuthor": "Galactic View",
+    "error": {
+      "title": "Could not load blog posts.",
+      "unknown": "Unknown error"
+    }
   },
   "epicDataPost": {
     "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",

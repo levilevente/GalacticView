@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 class BlogPostCreate(BaseModel):
@@ -8,7 +8,7 @@ class BlogPostCreate(BaseModel):
     title: str
     content: str
     author_id: str
-    image_urls: List[str] = []
+    image_urls: List[str] = Field(default_factory=list)
 
 class BlogPostResponse(BlogPostCreate):
     """

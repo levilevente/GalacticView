@@ -11,11 +11,12 @@ class StorageService:
         self.s3_endpoint = os.getenv("S3_ENDPOINT")
         self.aws_region = os.getenv("AWS_REGION", "eu-central-1")
 
-    def upload_image(self, file_obj, original_filename: str, content_type: str) -> str:
+    def upload_image(self, file_obj, original_filename: str | None, content_type: str | None) -> str:
         """
         Uploads a file to the storage bucket and returns the public URL.
         """
-        file_extension = original_filename.split(".")[-1]
+        _, ext = os.path.splitext(original_filename or "")
+        file_extension = ext.lstrip(".") or "bin"
         unique_filename = f"{uuid.uuid4()}.{file_extension}"
         
         s3_client.upload_fileobj(
@@ -23,7 +24,7 @@ class StorageService:
             self.bucket_name,
             unique_filename,
             ExtraArgs={
-                "ContentType": content_type, 
+                "ContentType": content_type or "application/octet-stream", 
                 "ACL": "public-read"
             }
         )

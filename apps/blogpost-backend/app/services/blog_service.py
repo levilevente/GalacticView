@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from app.repositories.blog_repo import BlogRepository
 from app.schema.blog_schema import BlogPostCreate
 
@@ -14,10 +14,10 @@ class BlogService:
         """
         Creates a new blog post by generating necessary metadata and saving it to the repository.
         """
-        document = post_data.dict()
-        
+        document = post_data.model_dump()
+                
         document["id"] = str(uuid.uuid4()) 
-        document["created_at"] = datetime.utcnow().isoformat()
+        document["created_at"] = datetime.now(timezone.utc).isoformat()
         
         return self.repo.create_post(document)
 

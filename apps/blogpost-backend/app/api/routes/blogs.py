@@ -24,24 +24,24 @@ def get_storage_service():
     return StorageService()
 
 @router.post("/upload-image")
-async def upload_image(
+def upload_image(
     file: UploadFile = File(...),
     storage: StorageService = Depends(get_storage_service)
-  ):
+):
     """
     Receives an image file, uploads it to S3, and returns the public URL.
     """
     try:
-        image_url = storage.upload_image(file.file, file.filename, file.content_type)
+        image_url = storage.upload_image(file.file, file.filename or "upload", file.content_type or "application/octet-stream")
         return {
             "status": "success", 
             "image_url": image_url
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to upload image")
     
 @router.post("/", response_model=BlogPostResponse)
-async def create_blog_post(
+def create_blog_post(
     request: BlogPostCreate, 
     service: BlogService = Depends(get_blog_service)
 ):
@@ -51,14 +51,14 @@ async def create_blog_post(
     return service.create_new_blog(request)
 
 @router.get("/", response_model=List[BlogPostResponse])
-async def get_blogs(service: BlogService = Depends(get_blog_service)):
+def get_blogs(service: BlogService = Depends(get_blog_service)):
     """
     Fetches all blog posts.
     """
     return service.fetch_all_blogs()
 
 @router.delete("/{blog_id}")
-async def delete_blog(
+def delete_blog(
     blog_id: str,
     service: BlogService = Depends(get_blog_service)
 ):

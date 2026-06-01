@@ -11,7 +11,8 @@ load_dotenv()
 
 app = FastAPI(title="GalacticView Blog Content Service")
 
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+ALLOWED_ORIGINS = [o.strip() 
+                    for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,7 +23,7 @@ app.add_middleware(
 )
 
 @app.get("/health", tags=["System"])
-async def health_check():
+def health_check():
     """
     Kubernetes will use this endpoint to check if the service is alive and healthy.
     """

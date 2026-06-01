@@ -22,3 +22,10 @@ class BlogRepository:
         # For massive datasets later, this will be upgraded to Query/Pagination.
         response = self.table.scan()
         return response.get('Items', [])
+
+    def delete_post(self, post_id: str) -> dict:
+        """
+        Deletes a blog post from the DynamoDB table by ID.
+        """
+        self.table.delete_item(Key={'id': post_id})
+        return {'id': post_id, 'status': 'deleted'}

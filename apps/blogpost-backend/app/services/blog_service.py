@@ -16,8 +16,7 @@ class BlogService:
         """
         document = post_data.dict()
         
-        document["id"] = str(uuid.uuid4())
-        
+        document["id"] = str(uuid.uuid4()) 
         document["created_at"] = datetime.utcnow().isoformat()
         
         return self.repo.create_post(document)
@@ -27,3 +26,9 @@ class BlogService:
         Fetches all blog posts from the repository.
         """
         return self.repo.get_all_posts()
+
+    def delete_blog(self, blog_id: str) -> dict:
+        """
+        Deletes a blog post by ID from the repository.
+        """
+        return self.repo.delete_post(blog_id)

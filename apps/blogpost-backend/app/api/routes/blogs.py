@@ -56,3 +56,13 @@ async def get_blogs(service: BlogService = Depends(get_blog_service)):
     Fetches all blog posts.
     """
     return service.fetch_all_blogs()
+
+@router.delete("/{blog_id}")
+async def delete_blog(
+    blog_id: str,
+    service: BlogService = Depends(get_blog_service)
+):
+    """
+    Deletes a blog post by ID.
+    """
+    return service.delete_blog(blog_id)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Container, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -24,8 +24,13 @@ function BlogPostPageCreate() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
+    useEffect(() => {
+        if (!isAuthenticated) {
+            void navigate('/login');
+        }
+    }, [isAuthenticated, navigate]);
+
     if (!isAuthenticated) {
-        void navigate('/login');
         return null;
     }
 

@@ -25,7 +25,7 @@ def get_storage_service():
     return StorageService()
 
 @router.post("/upload-image", dependencies=[Depends(require_auth)])
-def upload_image(
+async def upload_image(
     file: UploadFile = File(...),
     storage: StorageService = Depends(get_storage_service),
 ):
@@ -44,7 +44,7 @@ def upload_image(
         raise HTTPException(status_code=500, detail="Failed to upload image")
     
 @router.post("/", response_model=BlogPostResponse)
-def create_blog_post(
+async def create_blog_post(
     request: BlogPostCreate,
     author_name: str = Depends(get_author_name),
     service: BlogService = Depends(get_blog_service),
@@ -58,14 +58,14 @@ def create_blog_post(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=List[BlogPostResponse])
-def get_blogs(service: BlogService = Depends(get_blog_service)):
+async def get_blogs(service: BlogService = Depends(get_blog_service)):
     """
     Fetches all blog posts.
     """
     return service.fetch_all_blogs()
 
 @router.delete("/{blog_id}")
-def delete_blog(
+async def delete_blog(
     blog_id: str,
     author_name: str = Depends(get_author_name),
     service: BlogService = Depends(get_blog_service),

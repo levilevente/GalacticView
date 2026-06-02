@@ -41,7 +41,8 @@ class StorageService:
         """
         Uploads an image to S3 under the "temp/" folder and returns its URL.
         """
-        file_extension = original_filename.split(".")[-1]
+        _, ext = os.path.splitext(original_filename)
+        file_extension = ext.lstrip(".") or "bin"
         unique_filename = f"{uuid.uuid4()}.{file_extension}"
         s3_key = f"temp/{unique_filename}"
 

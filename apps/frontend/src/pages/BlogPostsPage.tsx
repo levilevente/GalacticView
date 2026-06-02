@@ -34,7 +34,7 @@ function getPostPreview(content: string, length = 220) {
     return `${content.slice(0, length).trimEnd()}...`;
 }
 
-function BlogPostPage() {
+function BlogPostsPage() {
     const navigate = useNavigate();
     const { isAuthenticated, user } = useAuth();
     const { data: posts = [], isLoading, error, refetch } = useBlogPosts();
@@ -157,4 +157,4 @@ function BlogPostPage() {
     );
 }
 
-export default BlogPostPage;
+export default BlogPostsPage;

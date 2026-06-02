@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from app.repositories.blog_repo import BlogRepository
 from app.schema.blog_schema import BlogPostCreate
 from app.services.storage_service import StorageService
@@ -20,7 +20,7 @@ class BlogService:
         document = post_data.dict()
         document["id"] = str(uuid.uuid4())
         document["author_name"] = author_name
-        document["created_at"] = datetime.utcnow().isoformat()
+        document["created_at"] = datetime.now(timezone.utc).isoformat()
         
         # move all the images sent by FE to 'published/' so the 24-hour AWS grim reaper doesn't delete them
         permanent_image_urls = []

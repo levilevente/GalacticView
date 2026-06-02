@@ -1,5 +1,6 @@
 import os
 import uuid
+from typing import BinaryIO
 
 from botocore.exceptions import ClientError
 
@@ -18,12 +19,12 @@ class StorageService:
     """
     A service class responsible for handling all interactions with the storage layer (S3).
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.bucket_name = os.getenv("S3_BUCKET_NAME", "galactic-blog-images")
         self.s3_endpoint = os.getenv("S3_ENDPOINT")
         self.aws_region = os.getenv("AWS_REGION", "eu-central-1")
 
-    def _get_base_url(self):
+    def _get_base_url(self) -> str:
         if self.s3_endpoint:
             return f"{self.s3_endpoint}/{self.bucket_name}"
         return f"https://{self.bucket_name}.s3.{self.aws_region}.amazonaws.com"
@@ -37,7 +38,7 @@ class StorageService:
                 return False
             raise
 
-    def upload_image(self, file_obj, original_filename: str, content_type: str) -> str:
+    def upload_image(self, file_obj: BinaryIO, original_filename: str, content_type: str) -> str:
         """
         Uploads an image to S3 under the "temp/" folder and returns its URL.
         """

@@ -1,7 +1,10 @@
 import datetime
+from typing import Any
+
 from fastapi import HTTPException
 from firebase_admin import auth
 from app.repositories.user_repo import UserRepository
+from app.models.user_model import User
 
 class AuthService:
     """
@@ -10,7 +13,9 @@ class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def register_user(self, id_token: str, username: str, first_name: str, last_name: str):
+    def register_user(
+        self, id_token: str, username: str, first_name: str, last_name: str
+    ) -> dict[str, Any]:
         """
         1. Verify the username is available in the DB
         2. Verify with Firebase
@@ -36,13 +41,13 @@ class AuthService:
 
         return self._create_cookie(id_token)
 
-    def login_user(self, id_token: str):
+    def login_user(self, id_token: str) -> dict[str, Any]:
         """
         Creates cookie on login
         """
         return self._create_cookie(id_token)
     
-    def get_user_by_id(self, user_id: str):
+    def get_user_by_id(self, user_id: str) -> User:
         """
         Retrieve a user by their unique ID (Firebase UID).
         """

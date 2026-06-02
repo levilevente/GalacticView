@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Response, HTTPException, Depends
+from fastapi import APIRouter, Response, Depends
 from pydantic import BaseModel
+from typing import Any
 from app.api.dependencies import get_current_user
 from app.schema.user_schema import RegisterRequest
 from app.repositories.user_repo import UserRepository
@@ -14,7 +15,7 @@ class TokenRequest(BaseModel):
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-def get_auth_service(db: Session = Depends(get_db)):
+def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
     """
     DI helper
     """
@@ -26,7 +27,7 @@ async def register(
     request: RegisterRequest, 
     response: Response, 
     service: AuthService = Depends(get_auth_service)
-):
+) -> dict[str, str]:
     """
     1. Verify the username is available in the DB
     2. Verify with Firebase
@@ -50,7 +51,7 @@ async def login(
     request: TokenRequest, 
     response: Response, 
     service: AuthService = Depends(get_auth_service)
-):
+) -> dict[str, str]:
     """
     Just mint the cookie, the frontend already verified the password.
     """
@@ -64,7 +65,7 @@ async def login(
 
 
 @router.post("/logout")
-async def logout(response: Response):
+async def logout(response: Response) -> dict[str, str]:
     """
     Clear the session cookie to log the user out.
     """
@@ -76,7 +77,7 @@ async def logout(response: Response):
 async def get_my_profile(
     uid: str = Depends(get_current_user),
     service: AuthService = Depends(get_auth_service)
-):
+) -> dict[str, Any]:
     """
     Retrieve the current user's information based on the session cookie.
     """

@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 @app.get("/health", tags=["System"])
-def health_check():
+def health_check() -> dict[str, str]:
     """
     Kubernetes will use this endpoint to check if the service is alive and healthy.
     """

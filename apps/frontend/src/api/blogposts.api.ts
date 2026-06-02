@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { BlogPostTypeIn, BlogPostTypeOut } from '../types/BlogPostsType';
+import type { BlogPostTypeIn, BlogPostTypeOut, UploadImageResponse } from '../types/BlogPostsType';
 
 const baseUrl = import.meta.env.VITE_BLOGPOSTS_API_BASE_URL as string;
 if (!baseUrl) {
@@ -26,7 +26,15 @@ export async function createBlogPosts(newBlogPost: BlogPostTypeOut): Promise<Blo
     return res.data;
 }
 
-export async function uploadImage(): Promise<string> {
-    const res = await blogPostsApi.post<string>('/blogs/upload-image');
-    return res.data;
+export async function uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await blogPostsApi.post<UploadImageResponse>('/blogs/upload-image', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return res.data.image_url;
 }

@@ -14,3 +14,8 @@ export interface BlogPostTypeIn {
     author?: string;
     author_id?: string;
 }
+
+export interface UploadImageResponse {
+    status: string;
+    image_url: string;
+}

@@ -48,7 +48,7 @@ def create_blog_post(
     """
     Creates a new blog post.
     """
-    return service.create_new_blog(request)
+    return service.create_new_blog(request, request.author_id)
 
 @router.get("/", response_model=List[BlogPostResponse])
 def get_blogs(service: BlogService = Depends(get_blog_service)):

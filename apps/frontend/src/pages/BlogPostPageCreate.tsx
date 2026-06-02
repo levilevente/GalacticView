@@ -3,7 +3,7 @@ import { Alert, Button, Card, Container, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { createBlogPosts } from '../api/blogposts.api.ts';
+import { createBlogPosts, uploadImage } from '../api/blogposts.api.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { BlogPostTypeOut } from '../types/BlogPostsType.ts';
 import style from './BlogPostPageCreate.module.css';
@@ -22,6 +22,7 @@ function BlogPostPageCreate() {
 
     const [currentImageUrl, setCurrentImageUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isImageUploading, setIsImageUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
@@ -29,6 +30,28 @@ function BlogPostPageCreate() {
         void navigate('/login');
         return null;
     }
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setIsImageUploading(true);
+            setError(null);
+            const uploadedUrl = await uploadImage(file);
+            setFormData((prev) => ({
+                ...prev,
+                image_urls: [...prev.image_urls, uploadedUrl],
+            }));
+        } catch (err) {
+            const errorMessage =
+                err instanceof Error ? err.message : t('blogPostCreate.errors.uploadFailed') || 'Image upload failed';
+            setError(errorMessage);
+        } finally {
+            setIsImageUploading(false);
+            e.target.value = '';
+        }
+    };
 
     const handleAddImageUrl = () => {
         if (currentImageUrl.trim()) {
@@ -143,7 +166,19 @@ function BlogPostPageCreate() {
                             </Form.Group>
 
                             <Form.Group className="mb-4" controlId="formImageUrls">
-                                <Form.Label>{t('blogPostCreate.imageUrlsLabel')}</Form.Label>
+                                <Form.Label>{t('blogPostCreate.imageUrlsLabel', 'Image Upload')}</Form.Label>
+
+                                <div className="mb-3">
+                                    <Form.Control
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => void handleImageUpload(e)}
+                                        disabled={isLoading || isImageUploading}
+                                    />
+                                    {isImageUploading ? (
+                                        <div className="mt-2 text-muted">Uploading image...</div>
+                                    ) : null}
+                                </div>
 
                                 <div className="d-flex gap-2 mb-3">
                                     <Form.Control
@@ -151,7 +186,7 @@ function BlogPostPageCreate() {
                                         placeholder={t('blogPostCreate.imageUrlPlaceholder')}
                                         value={currentImageUrl}
                                         onChange={(e) => setCurrentImageUrl(e.target.value)}
-                                        disabled={isLoading}
+                                        disabled={isLoading || isImageUploading}
                                         onKeyPress={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault();
@@ -162,7 +197,7 @@ function BlogPostPageCreate() {
                                     <Button
                                         variant="outline-dark"
                                         onClick={handleAddImageUrl}
-                                        disabled={!currentImageUrl.trim() || isLoading}
+                                        disabled={!currentImageUrl.trim() || isLoading || isImageUploading}
                                     >
                                         {t('blogPostCreate.addImageButton')}
                                     </Button>
@@ -171,16 +206,35 @@ function BlogPostPageCreate() {
                                 {formData.image_urls.length > 0 ? (
                                     <div className={style.imageUrlsList}>
                                         {formData.image_urls.map((url, index) => (
-                                            <div key={index} className={style.imageUrlItem}>
-                                                <span className={style.imageUrlText}>{url}</span>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleRemoveImageUrl(index)}
-                                                    disabled={isLoading}
-                                                >
-                                                    {t('blogPostCreate.removeButton')}
-                                                </Button>
+                                            <div
+                                                key={index}
+                                                className={`d-flex flex-column mb-3 ${style.imageUrlItem}`}
+                                            >
+                                                <div className="d-flex align-items-center mb-2">
+                                                    <span
+                                                        className={`me-auto text-truncate ${style.imageUrlText}`}
+                                                        style={{ maxWidth: '80%' }}
+                                                    >
+                                                        {url}
+                                                    </span>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => handleRemoveImageUrl(index)}
+                                                        disabled={isLoading}
+                                                    >
+                                                        {t('blogPostCreate.removeButton')}
+                                                    </Button>
+                                                </div>
+                                                <img
+                                                    src={url}
+                                                    alt={`preview ${index}`}
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '200px',
+                                                        objectFit: 'contain',
+                                                    }}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -188,13 +242,13 @@ function BlogPostPageCreate() {
                             </Form.Group>
 
                             <div className={style.formActions}>
-                                <Button variant="dark" type="submit" disabled={isLoading}>
+                                <Button variant="dark" type="submit" disabled={isLoading || isImageUploading}>
                                     {isLoading ? t('blogPostCreate.saving') : t('blogPostCreate.publishButton')}
                                 </Button>
                                 <Button
                                     variant="outline-dark"
                                     onClick={() => void navigate('/blogpost')}
-                                    disabled={isLoading}
+                                    disabled={isLoading || isImageUploading}
                                 >
                                     {t('blogPostCreate.cancelButton')}
                                 </Button>

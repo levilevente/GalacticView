@@ -9,6 +9,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.api.routes import auth
 from contextlib import asynccontextmanager
+from collections.abc import AsyncGenerator
 import firebase_admin
 from app.core.database import engine, Base
 
@@ -31,7 +32,7 @@ limiter = Limiter(key_func=get_real_ip)
 Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
         Initialize Firebase Admin SDK when the FastAPI app starts.
     """

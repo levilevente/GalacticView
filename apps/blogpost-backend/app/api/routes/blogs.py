@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
-from typing import List
+from typing import Any, List
+
 from app.api.dependencies import get_author_name, require_auth
 from app.schema.blog_schema import BlogPostCreate, BlogPostResponse
 from app.repositories.blog_repo import BlogRepository
@@ -10,7 +11,7 @@ from app.services.storage_service import StorageService, ImagePromotionError
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
 
-def get_blog_service():
+def get_blog_service() -> BlogService:
     """
     Connect to the specific DynamoDB table
     """
@@ -18,7 +19,7 @@ def get_blog_service():
     repo = BlogRepository(table)
     return BlogService(repo)
 
-def get_storage_service():
+def get_storage_service() -> StorageService:
     """
     Provides an instance of StorageService for handling S3 interactions.
     """
@@ -28,7 +29,7 @@ def get_storage_service():
 async def upload_image(
     file: UploadFile = File(...),
     storage: StorageService = Depends(get_storage_service),
-):
+) -> dict[str, Any]:
     """
     Receives an image file, uploads it to S3, and returns the public URL.
     """
@@ -48,7 +49,7 @@ async def create_blog_post(
     request: BlogPostCreate,
     author_name: str = Depends(get_author_name),
     service: BlogService = Depends(get_blog_service),
-):
+) -> dict[str, Any]:
     """
     Creates a new blog post. The author name is resolved from the session cookie.
     """
@@ -58,7 +59,7 @@ async def create_blog_post(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=List[BlogPostResponse])
-async def get_blogs(service: BlogService = Depends(get_blog_service)):
+async def get_blogs(service: BlogService = Depends(get_blog_service)) -> list[BlogPostResponse]:
     """
     Fetches all blog posts.
     """
@@ -69,7 +70,7 @@ async def delete_blog(
     blog_id: str,
     author_name: str = Depends(get_author_name),
     service: BlogService = Depends(get_blog_service),
-):
+) -> dict[str, str]:
     """
     Deletes a blog post by ID. Only the author can delete their own posts.
     """

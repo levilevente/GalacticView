@@ -1,4 +1,6 @@
-from fastapi import Request, HTTPException, Depends
+from collections.abc import Generator
+
+from fastapi import Request, HTTPException
 from firebase_admin import auth
 from app.core.database import SessionLocal
 
@@ -22,7 +24,7 @@ async def get_current_user(request: Request) -> str:
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid session cookie")
 
-def get_db():
+def get_db() -> Generator:
     """
     Dependency that creates a new PostgreSQL session per HTTP request 
     and safely closes it when the request is finished.

@@ -3,6 +3,7 @@ from datetime import datetime
 from app.repositories.blog_repo import BlogRepository
 from app.schema.blog_schema import BlogPostCreate
 from app.services.storage_service import StorageService
+from fastapi import HTTPException
 
 class BlogService:
     """
@@ -43,7 +44,7 @@ class BlogService:
         """
         post = self.repo.get_post_by_id(blog_id)
         if not post:
-            raise PermissionError("Blog post not found")
+            raise HTTPException(status_code=404, detail="Blog post not found")
 
         if post.get("author_name") != requesting_author:
             raise PermissionError("You can only delete your own posts")

@@ -24,7 +24,10 @@
     "error": {
       "title": "Could not load blog posts.",
       "unknown": "Unknown error"
-    }
+    },
+    "deleteError": "Failed to delete blog post. You can only delete your own posts.",
+    "deleting": "Deleting...",
+    "delete": "Delete"
   },
   "blogPostCreate": {
     "title": "Create a New Blog Post",

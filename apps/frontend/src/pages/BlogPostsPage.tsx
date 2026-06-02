@@ -40,6 +40,7 @@ function BlogPostPage() {
     const { data: posts = [], isLoading, error, refetch } = useBlogPosts();
     const { t } = useTranslation();
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [err, setErr] = useState<string | null>(null);
 
     const handleCreatePostClick = () => {
         void navigate(isAuthenticated ? '/blogpost/new' : '/login');
@@ -51,11 +52,20 @@ function BlogPostPage() {
             await deleteBlogPost(postId);
             await refetch();
         } catch {
-            // silently fail — the backend returns 403 if not the author
+            console.error('Failed to delete blog post');
+            setErr(t('blogPosts.deleteError'));
         } finally {
             setDeletingId(null);
         }
     };
+
+    if (err) {
+        return (
+            <Alert variant="danger" className="mt-4">
+                <strong>{t('blogPosts.error.title')}</strong> {err}
+            </Alert>
+        );
+    }
 
     return (
         <div className={style.pageShell}>

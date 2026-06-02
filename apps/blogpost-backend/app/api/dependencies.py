@@ -51,7 +51,7 @@ async def get_author_name(request: Request) -> str:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     user = await _verify_session(session_cookie)
-    name = user.get("username") or f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    name = user.get("username")
     if not name:
         raise HTTPException(status_code=401, detail="Could not resolve author identity")
 

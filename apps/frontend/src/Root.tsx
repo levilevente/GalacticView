@@ -5,6 +5,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AgentChatWidget from './components/AgentChatWidget.tsx';
 import FooterBar from './components/FooterBar.tsx';
 import NavigationBar from './components/NavigationBar.tsx';
+import BlogPostPageCreate from './pages/BlogPostPageCreate.tsx';
+import BlogPostsPage from './pages/BlogPostsPage.tsx';
 import EpicDataPage from './pages/EpicDataPage.tsx';
 import EpicDataPostPage from './pages/EpicDataPostPage.tsx';
 import HomePage from './pages/HomePage.tsx';
@@ -24,7 +26,8 @@ function Root() {
                         <Routes>
                             <Route path="/" element={<HomePage />} />
                             <Route path="/epicdata" element={<EpicDataPage />} />
-                            {/*<Route path="/blogpost" element={<BlogPostPage />} />*/}
+                            <Route path="/blogpost" element={<BlogPostsPage />} />
+                            <Route path="/blogpost/new" element={<BlogPostPageCreate />} />
                             <Route path="/imageoftheday" element={<ImageOfTheDayPage />} />
                             <Route path="/epicdata/:epicDataDate" element={<EpicDataPostPage />} />
                             <Route path="/search/item/:nasaId" element={<SearchItemPage />} />

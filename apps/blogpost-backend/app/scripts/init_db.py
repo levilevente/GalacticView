@@ -44,6 +44,37 @@ def setup_s3():
     except Exception as e:
         print(f"⚠️ S3 Bucket status: {e}")
 
+def set_s3_lifecycle_rule():
+    """
+    Sets a lifecycle rule on the S3 bucket to automatically delete images in the "temp/" folder after 24 hours.
+    """
+    bucket_name = os.getenv("S3_BUCKET_NAME", "galactic-blog-images")
+    
+    lifecycle_configuration = {
+        'Rules': [
+            {
+                'ID': 'DeleteTempImagesAfter24Hours',
+                'Filter': {
+                    'Prefix': 'temp/'
+                },
+                'Status': 'Enabled',
+                'Expiration': {
+                    'Days': 1 # Delete after 1 day
+                }
+            }
+        ]
+    }
+    
+    try:
+        s3_client.put_bucket_lifecycle_configuration(
+            Bucket=bucket_name,
+            LifecycleConfiguration=lifecycle_configuration
+        )
+        print("✅ S3 Lifecycle Rule set: Temp images expire in 24 hours.")
+    except Exception as e:
+        print(f"⚠️ S3 Lifecycle configuration failed: {e}")
+
 if __name__ == "__main__":
     setup_dynamodb()
     setup_s3()
+    set_s3_lifecycle_rule()

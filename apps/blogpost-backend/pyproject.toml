@@ -14,7 +14,8 @@ dependencies = [
     "boto3 (>=1.43.18,<2.0.0)",
     "python-dotenv (>=1.2.2,<2.0.0)",
     "python-multipart (>=0.0.29,<0.0.30)",
-    "mypy-boto3-dynamodb (>=1.43.0,<2.0.0)"
+    "mypy-boto3-dynamodb (>=1.43.0,<2.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
 ]
 
 

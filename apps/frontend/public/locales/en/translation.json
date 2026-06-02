@@ -7,13 +7,49 @@
   "navigation": {
     "epicData": "Epic Data",
     "imageOfTheDay": "Image of the Day",
-    "blogPost": "Blog Post",
+    "blogPosts": "Blog Posts",
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
     "loggedInAs": "Logged in as",
     "profile": "Profile",
     "settings": "Settings"
+  },
+  "blogPosts": {
+    "feedTitle": "Feed",
+    "createPost": "Create post",
+    "badge": "Blog post",
+    "empty": "No blog posts are available yet.",
+    "defaultAuthor": "Galactic View",
+    "error": {
+      "title": "Could not load blog posts.",
+      "unknown": "Unknown error"
+    },
+    "deleteError": "Failed to delete blog post. You can only delete your own posts.",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
+  "blogPostCreate": {
+    "title": "Create a New Blog Post",
+    "titleLabel": "Post Title",
+    "titlePlaceholder": "Enter your post title",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Write your blog post content here...",
+    "authorIdLabel": "Author ID (Optional)",
+    "authorIdPlaceholder": "Your author ID or username",
+    "imageUrlsLabel": "Image URLs",
+    "imageUrlPlaceholder": "Enter an image URL",
+    "addImageButton": "Add Image",
+    "removeButton": "Remove",
+    "publishButton": "Publish",
+    "cancelButton": "Cancel",
+    "saving": "Publishing...",
+    "successMessage": "Blog post published successfully! Redirecting...",
+    "errors": {
+      "titleRequired": "Please enter a post title.",
+      "contentRequired": "Please enter post content.",
+      "createFailed": "Failed to create blog post. Please try again."
+    }
   },
   "epicDataPost": {
     "title": "NASA's EPIC camera onboard the NOAA DSCOVR spacecraft",

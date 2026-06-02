@@ -80,6 +80,9 @@ function NavigationBar() {
                         <Nav.Link href="/imageoftheday" className={style.navLinkStyle}>
                             {t('navigation.imageOfTheDay')}
                         </Nav.Link>
+                        <Nav.Link href="/blogpost" className={style.navLinkStyle}>
+                            {t('navigation.blogPosts')}
+                        </Nav.Link>
                         <Button
                             ref={profileButtonRef}
                             variant="none"

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from typing import List
+from app.api.dependencies import get_author_name
 from app.schema.blog_schema import BlogPostCreate, BlogPostResponse
 from app.repositories.blog_repo import BlogRepository
 from app.services.blog_service import BlogService
 from app.core.aws import dynamodb
-from app.services.storage_service import StorageService
+from app.services.storage_service import StorageService, ImagePromotionError
 
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
@@ -37,18 +38,24 @@ def upload_image(
             "status": "success", 
             "image_url": image_url
         }
+    except ImagePromotionError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to upload image")
     
 @router.post("/", response_model=BlogPostResponse)
 def create_blog_post(
-    request: BlogPostCreate, 
-    service: BlogService = Depends(get_blog_service)
+    request: BlogPostCreate,
+    author_name: str = Depends(get_author_name),
+    service: BlogService = Depends(get_blog_service),
 ):
     """
-    Creates a new blog post.
+    Creates a new blog post. The author name is resolved from the session cookie.
     """
-    return service.create_new_blog(request, request.author_id)
+    try:
+        return service.create_new_blog(request, author_name)
+    except ImagePromotionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=List[BlogPostResponse])
 def get_blogs(service: BlogService = Depends(get_blog_service)):

@@ -12,13 +12,13 @@ class BlogService:
         self.repo = repo
         self.storage_service = StorageService()
 
-    def create_new_blog(self, post_data: BlogPostCreate, author_id: str) -> dict:
+    def create_new_blog(self, post_data: BlogPostCreate, author_name: str) -> dict:
         """
         Creates a new blog post by generating necessary metadata and saving it to the repository.
         """
         document = post_data.dict()
         document["id"] = str(uuid.uuid4())
-        document["author_id"] = author_id
+        document["author_name"] = author_name
         document["created_at"] = datetime.utcnow().isoformat()
         
         # move all the images sent by FE to 'published/' so the 24-hour AWS grim reaper doesn't delete them

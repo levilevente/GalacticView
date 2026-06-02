@@ -17,10 +17,8 @@ function BlogPostPageCreate() {
         title: '',
         content: '',
         image_urls: [],
-        author_id: '',
     });
 
-    const [currentImageUrl, setCurrentImageUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isImageUploading, setIsImageUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -50,16 +48,6 @@ function BlogPostPageCreate() {
         } finally {
             setIsImageUploading(false);
             e.target.value = '';
-        }
-    };
-
-    const handleAddImageUrl = () => {
-        if (currentImageUrl.trim()) {
-            setFormData((prev) => ({
-                ...prev,
-                image_urls: [...prev.image_urls, currentImageUrl.trim()],
-            }));
-            setCurrentImageUrl('');
         }
     };
 
@@ -153,18 +141,6 @@ function BlogPostPageCreate() {
                                 />
                             </Form.Group>
 
-                            <Form.Group className="mb-4" controlId="formAuthorId">
-                                <Form.Label>{t('blogPostCreate.authorIdLabel')}</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="author_id"
-                                    placeholder={t('blogPostCreate.authorIdPlaceholder')}
-                                    value={formData.author_id}
-                                    onChange={handleInputChange}
-                                    disabled={isLoading}
-                                />
-                            </Form.Group>
-
                             <Form.Group className="mb-4" controlId="formImageUrls">
                                 <Form.Label>{t('blogPostCreate.imageUrlsLabel', 'Image Upload')}</Form.Label>
 
@@ -178,29 +154,6 @@ function BlogPostPageCreate() {
                                     {isImageUploading ? (
                                         <div className="mt-2 text-muted">Uploading image...</div>
                                     ) : null}
-                                </div>
-
-                                <div className="d-flex gap-2 mb-3">
-                                    <Form.Control
-                                        type="url"
-                                        placeholder={t('blogPostCreate.imageUrlPlaceholder')}
-                                        value={currentImageUrl}
-                                        onChange={(e) => setCurrentImageUrl(e.target.value)}
-                                        disabled={isLoading || isImageUploading}
-                                        onKeyPress={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                handleAddImageUrl();
-                                            }
-                                        }}
-                                    />
-                                    <Button
-                                        variant="outline-dark"
-                                        onClick={handleAddImageUrl}
-                                        disabled={!currentImageUrl.trim() || isLoading || isImageUploading}
-                                    >
-                                        {t('blogPostCreate.addImageButton')}
-                                    </Button>
                                 </div>
 
                                 {formData.image_urls.length > 0 ? (

@@ -21,7 +21,7 @@ function formatPostDate(value: string) {
 }
 
 function getPostAuthor(post: BlogPostTypeIn, defaultAuthor: string) {
-    return post.author ?? post.author_id ?? defaultAuthor;
+    return post.author_name ?? defaultAuthor;
 }
 
 function getPostPreview(content: string, length = 220) {
@@ -64,13 +64,16 @@ function BlogPostPage() {
                     </Alert>
                 ) : null}
 
+                <div className="mt-5">
+                    <Button variant="dark" onClick={handleCreatePostClick}>
+                        {t('blogPosts.createPost')}
+                    </Button>
+                </div>
+
                 {posts.length ? (
                     <div className="mt-5">
                         <div className={style.sectionHeading}>
                             <h2 className="mb-0">{t('blogPosts.feedTitle')}</h2>
-                            <Button variant="dark" onClick={handleCreatePostClick}>
-                                {t('blogPosts.createPost')}
-                            </Button>
                         </div>
 
                         <Row xs={1} className="g-4 mt-1">

@@ -2,7 +2,6 @@ export interface BlogPostTypeOut {
     title: string;
     content: string;
     image_urls: string[];
-    author_id?: string;
 }
 
 export interface BlogPostTypeIn {
@@ -11,8 +10,7 @@ export interface BlogPostTypeIn {
     content: string;
     image_urls: string[];
     created_at: string;
-    author?: string;
-    author_id?: string;
+    author_name: string;
 }
 
 export interface UploadImageResponse {

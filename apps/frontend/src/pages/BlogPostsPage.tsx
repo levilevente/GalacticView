@@ -110,7 +110,9 @@ function BlogPostPage() {
                                                         disabled={deletingId === post.id}
                                                         onClick={() => void handleDelete(post.id)}
                                                     >
-                                                        {deletingId === post.id ? t('blogPosts.deleting', 'Deleting...') : t('blogPosts.delete', 'Delete')}
+                                                        {deletingId === post.id
+                                                            ? t('blogPosts.deleting', 'Deleting...')
+                                                            : t('blogPosts.delete', 'Delete')}
                                                     </Button>
                                                 ) : null}
                                                 <Badge bg="secondary" pill>

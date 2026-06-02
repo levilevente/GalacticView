@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from typing import List
-from app.api.dependencies import get_author_name
+from app.api.dependencies import get_author_name, require_auth
 from app.schema.blog_schema import BlogPostCreate, BlogPostResponse
 from app.repositories.blog_repo import BlogRepository
 from app.services.blog_service import BlogService
@@ -24,10 +24,10 @@ def get_storage_service():
     """
     return StorageService()
 
-@router.post("/upload-image")
+@router.post("/upload-image", dependencies=[Depends(require_auth)])
 def upload_image(
     file: UploadFile = File(...),
-    storage: StorageService = Depends(get_storage_service)
+    storage: StorageService = Depends(get_storage_service),
 ):
     """
     Receives an image file, uploads it to S3, and returns the public URL.
@@ -64,10 +64,10 @@ def get_blogs(service: BlogService = Depends(get_blog_service)):
     """
     return service.fetch_all_blogs()
 
-@router.delete("/{blog_id}")
+@router.delete("/{blog_id}", dependencies=[Depends(require_auth)])
 def delete_blog(
     blog_id: str,
-    service: BlogService = Depends(get_blog_service)
+    service: BlogService = Depends(get_blog_service),
 ):
     """
     Deletes a blog post by ID.

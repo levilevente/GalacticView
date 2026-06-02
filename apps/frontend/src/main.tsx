@@ -5,6 +5,7 @@ import './i18n';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 
+import { AuthProvider } from './context/AuthContext.tsx';
 import { queryClient } from './query/common.query.ts';
 import Root from './Root.tsx';
 
@@ -15,7 +16,9 @@ if (!root) {
 }
 
 createRoot(root).render(
-    <QueryClientProvider client={queryClient}>
-        <Root />
-    </QueryClientProvider>,
+    <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+            <Root />
+        </QueryClientProvider>
+    </AuthProvider>,
 );

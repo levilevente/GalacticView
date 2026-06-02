@@ -29,11 +29,73 @@
     font-weight: 500;
 }
 
+.profileButtonStyle {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+}
+
+.profileButtonStyle:hover,
+.profileButtonStyle:focus {
+    color: #fff;
+}
+
+.profilePopoverStyle {
+    background-color: #111;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.profilePopoverStyle :global(.popover-arrow)::after {
+    border-bottom-color: #111;
+}
+
+.profilePopoverBodyStyle {
+    padding: 0.5rem 0.75rem;
+}
+
+.profileMenuItemStyle {
+    color: #fff;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 0.35rem;
+    display: block;
+}
+
+.profileMenuItemStyle:hover,
+.profileMenuItemStyle:focus {
+    color: #d6d6d6;
+    text-decoration: none;
+}
+
+.profileMenuItemStyle:global(.btn) {
+    background: transparent;
+    border: 0;
+    text-align: center;
+    width: 100%;
+}
+
 .searchForm {
     margin-right: auto;
     max-width: 130px;
     width: 100%;
     position: relative;
+}
+
+.profileMenuInfoStyle {
+    color: #fff;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.profileMenuDividerStyle {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.15);
+    margin: 0.5rem 0;
 }
 
 /* --------------------------------------------------------- */

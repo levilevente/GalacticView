@@ -1,0 +1,19 @@
+.pageWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.loginContainer {
+    width: 40vw;
+    min-width: 400px;
+    height: auto;
+    margin-top: 3vh;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}

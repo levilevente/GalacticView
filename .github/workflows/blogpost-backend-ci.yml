@@ -1,14 +1,14 @@
-name: BACKEND CI
+name: BLOGPOST BACKEND CI
 
 on:
   push:
     branches: [main, dev, feature/**]
     paths:
-      - "apps/backend/**"
+      - "apps/blogpost-backend/**"
   pull_request:
     branches: [main, dev, feature/**]
     paths:
-      - "apps/backend/**"
+      - "apps/blogpost-backend/**"
   workflow_dispatch: {}
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: apps/backend
+        working-directory: apps/blogpost-backend
 
     strategy:
       matrix:
@@ -44,20 +44,15 @@ jobs:
           path: |
             ~/.cache/pypoetry
             ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/backend/poetry.lock') }}
+          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/blogpost-backend/poetry.lock') }}
 
       - name: Install dependencies (including dev)
         run: |
           poetry config virtualenvs.create false
-          # With PEP 735 dependency-groups, dev dependencies are installed by
-          # default by `poetry install`. Use the plain install command so this
-          # workflow works regardless of Poetry version.
           poetry install --no-interaction
 
       - name: Ensure linters are available (fallback)
         run: |
-          # Some Poetry setups in CI may not expose console scripts as expected.
-          # Install ruff and mypy directly as a fallback so the commands exist.
           python -m pip install --upgrade pip
           python -m pip install ruff mypy
 
@@ -80,7 +75,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: apps/backend
+        working-directory: apps/blogpost-backend
 
     strategy:
       matrix:
@@ -106,7 +101,7 @@ jobs:
           path: |
             ~/.cache/pypoetry
             ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/backend/poetry.lock') }}
+          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/blogpost-backend/poetry.lock') }}
 
       - name: Install dependencies (no dev)
         run: |
@@ -120,6 +115,6 @@ jobs:
       - name: Upload dist
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: apps/backend/dist/*
+          name: blogpost-backend-dist
+          path: apps/blogpost-backend/dist/*
           retention-days: 1

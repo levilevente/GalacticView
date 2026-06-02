@@ -1,0 +1,46 @@
+[project]
+name = "core-backend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Daroczi Levente",email = "daroczilevente2@gmail.com"}
+]
+readme = "README.md"
+requires-python = "^3.11"
+dependencies = [
+    "fastapi (>=0.136.1,<0.137.0)",
+    "sqlalchemy[asyncio] (>=2.0.49,<3.0.0)",
+    "asyncpg (>=0.31.0,<0.32.0)",
+    "uvicorn (>=0.47.0,<0.48.0)",
+    "pydantic (>=2.13.4,<3.0.0)",
+    "slowapi (>=0.1.9,<0.2.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "psycopg2-binary (>=2.9.12,<3.0.0)",
+    "firebase-admin (>=7.4.0,<8.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [{ include = "app" }]
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+exclude = ["tests/.*", "bin/.*", "app/scripts/.*"]
+
+[[tool.mypy.overrides]]
+module = ["firebase_admin", "firebase_admin.*"]
+ignore_missing_imports = true
+
+[project.optional-dependencies]
+dev = [
+    "ruff (>=0.14.7,<0.15.0)",
+    "mypy (>=1.19.0,<2.0.0)",
+    "types-requests (>=2.32.4.20250913,<3.0.0.0)",
+]

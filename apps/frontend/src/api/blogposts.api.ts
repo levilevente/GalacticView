@@ -26,6 +26,10 @@ export async function createBlogPosts(newBlogPost: BlogPostTypeOut): Promise<Blo
     return res.data;
 }
 
+export async function deleteBlogPost(blogId: string): Promise<void> {
+    await blogPostsApi.delete(`/blogs/${blogId}`);
+}
+
 export async function uploadImage(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);

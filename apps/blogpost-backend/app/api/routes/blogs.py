@@ -64,12 +64,16 @@ def get_blogs(service: BlogService = Depends(get_blog_service)):
     """
     return service.fetch_all_blogs()
 
-@router.delete("/{blog_id}", dependencies=[Depends(require_auth)])
+@router.delete("/{blog_id}")
 def delete_blog(
     blog_id: str,
+    author_name: str = Depends(get_author_name),
     service: BlogService = Depends(get_blog_service),
 ):
     """
-    Deletes a blog post by ID.
+    Deletes a blog post by ID. Only the author can delete their own posts.
     """
-    return service.delete_blog(blog_id)
+    try:
+        return service.delete_blog(blog_id, author_name)
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e)) from e

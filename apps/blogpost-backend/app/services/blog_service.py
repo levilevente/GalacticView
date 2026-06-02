@@ -37,8 +37,15 @@ class BlogService:
         """
         return self.repo.get_all_posts()
 
-    def delete_blog(self, blog_id: str) -> dict:
+    def delete_blog(self, blog_id: str, requesting_author: str) -> dict:
         """
-        Deletes a blog post by ID from the repository.
+        Deletes a blog post by ID, only if the requesting user is the author.
         """
+        post = self.repo.get_post_by_id(blog_id)
+        if not post:
+            raise PermissionError("Blog post not found")
+
+        if post.get("author_name") != requesting_author:
+            raise PermissionError("You can only delete your own posts")
+
         return self.repo.delete_post(blog_id)

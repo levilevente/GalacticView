@@ -23,6 +23,13 @@ class BlogRepository:
         response = self.table.scan()
         return response.get('Items', [])
 
+    def get_post_by_id(self, post_id: str) -> dict | None:
+        """
+        Fetches a single blog post by ID. Returns None if not found.
+        """
+        response = self.table.get_item(Key={'id': post_id})
+        return response.get('Item')
+
     def delete_post(self, post_id: str) -> dict:
         """
         Deletes a blog post from the DynamoDB table by ID.

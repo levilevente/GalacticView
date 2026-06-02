@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Alert, Badge, Button, Card, Col, Container, Image, Row, Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { deleteBlogPost } from '../api/blogposts.api.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useBlogPosts } from '../query/blogPosts.query.ts';
 import type { BlogPostTypeIn } from '../types/BlogPostsType.ts';
@@ -34,12 +36,25 @@ function getPostPreview(content: string, length = 220) {
 
 function BlogPostPage() {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
-    const { data: posts = [], isLoading, error } = useBlogPosts();
+    const { isAuthenticated, user } = useAuth();
+    const { data: posts = [], isLoading, error, refetch } = useBlogPosts();
     const { t } = useTranslation();
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const handleCreatePostClick = () => {
         void navigate(isAuthenticated ? '/blogpost/new' : '/login');
+    };
+
+    const handleDelete = async (postId: string) => {
+        setDeletingId(postId);
+        try {
+            await deleteBlogPost(postId);
+            await refetch();
+        } catch {
+            // silently fail — the backend returns 403 if not the author
+        } finally {
+            setDeletingId(null);
+        }
     };
 
     return (
@@ -87,9 +102,21 @@ function BlogPostPage() {
                                                 </div>
                                                 <div className={style.timeLine}>{formatPostDate(post.created_at)}</div>
                                             </div>
-                                            <Badge bg="secondary" pill>
-                                                {t('blogPosts.badge')}
-                                            </Badge>
+                                            <div className="d-flex align-items-center gap-2">
+                                                {user?.username === post.author_name ? (
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        disabled={deletingId === post.id}
+                                                        onClick={() => void handleDelete(post.id)}
+                                                    >
+                                                        {deletingId === post.id ? t('blogPosts.deleting', 'Deleting...') : t('blogPosts.delete', 'Delete')}
+                                                    </Button>
+                                                ) : null}
+                                                <Badge bg="secondary" pill>
+                                                    {t('blogPosts.badge')}
+                                                </Badge>
+                                            </div>
                                         </Card.Header>
 
                                         {post.image_urls[0] ? (

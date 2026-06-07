@@ -1,16 +1,15 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-import uvicorn
-
 import os
 
-from .service import chat_ask_question
-
-from .dto import ChatTypeIn, ChatTypeOut
-
+import uvicorn
+from fastapi import Depends, FastAPI, Request
 from loguru import logger
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from .dependencies import require_auth  # loads .env via load_dotenv()
+from .cors import add_cors_middleware
+from .dto import ChatTypeIn, ChatTypeOut
+from .service import chat_ask_question
 
 def get_real_ip(request: Request) -> str:
     """
@@ -31,18 +30,16 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # type: ignore
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+add_cors_middleware(app)
 
 
 @app.post("/chat")
 @limiter.limit("7/minute")
-def chat_endpoint(request: Request, body: ChatTypeIn) -> ChatTypeOut:
+def chat_endpoint(
+    request: Request,
+    body: ChatTypeIn,
+    _: None = Depends(require_auth),
+) -> ChatTypeOut:
     """
     Process chat questions using the agent and return structured responses.
     Rate limited to 7 requests per minute per IP.
@@ -59,12 +56,11 @@ def main() -> None:
     env = os.getenv("ENVIRONMENT", "prod")
 
     reload = env == "dev"
-    host = "127.0.0.1"
-    if env == "prod":
-        host = "0.0.0.0"
+    host = "0.0.0.0"
 
-    logger.info(f"Starting server on {host}:8000 with reload={reload}")
-    uvicorn.run("server.serve:app", host=host, port=8000, reload=reload)
+    port = int(os.getenv("PORT", "8003"))
+    logger.info(f"Starting agent server on {host}:{port} (reload={reload}, ENVIRONMENT={env})")
+    uvicorn.run("server.serve:app", host=host, port=port, reload=reload)
 
 if __name__ == "__main__":
     main()

@@ -3,8 +3,10 @@ import * as React from 'react';
 import { Button, Card, CloseButton, Form, InputGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { IoSend } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 
+import { useAuth } from '../context/AuthContext.tsx';
 import useAgentChat from '../hooks/useAgentChat.ts';
 import style from './AgentChatWidget.module.css';
 
@@ -12,11 +14,14 @@ const MAX_MESSAGE_LENGTH = 512;
 
 function AgentChatWidget() {
     const { t } = useTranslation();
+    const { isAuthenticated } = useAuth();
 
     const [isOpen, setIsOpen] = useState(false);
     const [inputMessage, setInputMessage] = useState('');
-    const { messages, isLoading, sendMessage } = useAgentChat();
+    const { messages, isLoading, questionSent, sendMessage } = useAgentChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const inputDisabled = !isAuthenticated || questionSent || isLoading;
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -31,7 +36,7 @@ function AgentChatWidget() {
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (inputMessage.trim() === '' || inputMessage.length > MAX_MESSAGE_LENGTH) return;
+        if (inputDisabled || inputMessage.trim() === '' || inputMessage.length > MAX_MESSAGE_LENGTH) return;
         setInputMessage('');
 
         try {
@@ -42,11 +47,18 @@ function AgentChatWidget() {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (inputDisabled) return;
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             void handleSendMessage(e);
         }
     };
+
+    const placeholder = !isAuthenticated
+        ? t('agent.loginRequired')
+        : questionSent
+          ? t('agent.oneQuestionOnly')
+          : t('agent.placeholder');
 
     return (
         <div className={style.agentContainer}>
@@ -77,18 +89,25 @@ function AgentChatWidget() {
                         <div ref={messagesEndRef} />
                     </Card.Body>
                     <Card.Footer className={style.cardFooter}>
-                        <Form onSubmit={(e) => void handleSendMessage(e)} onKeyDown={handleKeyDown}>
+                        {!isAuthenticated ? (
+                            <p className={`m-0 text-center ${style.authHint}`}>
+                                {t('agent.loginRequired')} <Link to="/login">{t('navigation.login')}</Link>
+                            </p>
+                        ) : null}
+                        <Form onSubmit={(e) => void handleSendMessage(e)}>
                             <InputGroup className={style.inputGroup}>
                                 <Form.Control
                                     as={TextareaAutosize}
                                     minRows={1}
                                     maxRows={5}
-                                    placeholder={t('agent.placeholder')}
+                                    placeholder={placeholder}
                                     className={style.chatInput}
                                     value={inputMessage}
                                     onChange={(e) => setInputMessage(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={inputDisabled}
                                 />
-                                <Button type="submit" variant="dark" disabled={isLoading}>
+                                <Button type="submit" variant="dark" disabled={inputDisabled}>
                                     <IoSend size={18} />
                                 </Button>
                             </InputGroup>

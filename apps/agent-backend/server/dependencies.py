@@ -1,0 +1,44 @@
+import os
+
+import httpx
+from dotenv import load_dotenv
+from fastapi import HTTPException, Request
+
+load_dotenv()
+
+CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8001")
+AUTH_REQUEST_TIMEOUT = 5.0
+
+
+async def _verify_session(session_cookie: str) -> dict:
+    """
+    Forwards the session cookie to the core-backend and returns the user dict.
+    Raises HTTPException on any auth failure.
+    """
+    async with httpx.AsyncClient(timeout=AUTH_REQUEST_TIMEOUT) as client:
+        try:
+            response = await client.get(
+                f"{CORE_BACKEND_URL}/auth/me",
+                cookies={"session": session_cookie},
+            )
+        except httpx.RequestError as exc:
+            raise HTTPException(status_code=502, detail="Auth service unavailable") from exc
+
+    if response.status_code == 401:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail="Auth service returned an error")
+
+    return response.json().get("user", {})
+
+
+async def require_auth(request: Request) -> None:
+    """
+    Lightweight auth guard — verifies the session cookie is present and valid.
+    """
+    session_cookie = request.cookies.get("session")
+    if not session_cookie:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    await _verify_session(session_cookie)

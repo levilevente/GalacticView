@@ -28,7 +28,6 @@ const useAgentChat = () => {
         };
 
         setMessages([userMessage]);
-        setQuestionSent(true);
         setIsLoading(true);
 
         try {
@@ -44,6 +43,7 @@ const useAgentChat = () => {
             };
 
             setMessages((prev) => [...prev, agentMessage]);
+            setQuestionSent(true);
         } catch (error) {
             const errorMessage: ChatMessage = {
                 id: uuidv4(),

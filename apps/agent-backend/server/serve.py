@@ -35,7 +35,7 @@ add_cors_middleware(app)
 
 @app.post("/chat")
 @limiter.limit("7/minute")
-async def chat_endpoint(
+def chat_endpoint(
     request: Request,
     body: ChatTypeIn,
     _: None = Depends(require_auth),

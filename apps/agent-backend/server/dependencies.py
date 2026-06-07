@@ -7,6 +7,7 @@ from fastapi import HTTPException, Request
 load_dotenv()
 
 CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8001")
+AUTH_REQUEST_TIMEOUT = 5.0
 
 
 async def _verify_session(session_cookie: str) -> dict:
@@ -14,7 +15,7 @@ async def _verify_session(session_cookie: str) -> dict:
     Forwards the session cookie to the core-backend and returns the user dict.
     Raises HTTPException on any auth failure.
     """
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=AUTH_REQUEST_TIMEOUT) as client:
         try:
             response = await client.get(
                 f"{CORE_BACKEND_URL}/auth/me",

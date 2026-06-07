@@ -75,7 +75,7 @@ async def logout(response: Response) -> dict[str, str]:
     """
     Clear the session cookie to log the user out.
     """
-    response.delete_cookie(key="session")
+    response.delete_cookie(key="session", path="/")
     return {"status": "success", "message": "Logout successful"}
 
 

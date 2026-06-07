@@ -1,7 +1,10 @@
 import os
 
 import httpx
+from dotenv import load_dotenv
 from fastapi import HTTPException, Request
+
+load_dotenv()
 
 CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8001")
 

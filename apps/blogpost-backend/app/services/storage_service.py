@@ -5,7 +5,6 @@ from typing import BinaryIO
 from botocore.exceptions import ClientError
 
 from app.core.aws import s3_client
-from app.core.s3_setup import ensure_s3_bucket
 
 
 class ImagePromotionError(Exception):
@@ -50,8 +49,6 @@ class StorageService:
         """
         Uploads an image to S3 under the "temp/" folder and returns its URL.
         """
-        ensure_s3_bucket()
-
         _, ext = os.path.splitext(original_filename)
         file_extension = ext.lstrip(".") or "bin"
         unique_filename = f"{uuid.uuid4()}.{file_extension}"

@@ -93,8 +93,9 @@ def main() -> None:
     if env == "prod":
         host = "0.0.0.0"
 
-    print(f"Starting server on {host}:8001 with reload={reload}")
-    uvicorn.run("app.main:app", host=host, port=8001, reload=reload)
+    port = int(os.getenv("PORT", "8000"))
+    print(f"Starting server on {host}:{port} with reload={reload}")
+    uvicorn.run("app.main:app", host=host, port=port, reload=reload)
 
 if __name__ == "__main__":
     main()

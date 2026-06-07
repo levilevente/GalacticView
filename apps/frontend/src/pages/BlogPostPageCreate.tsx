@@ -169,12 +169,6 @@ function BlogPostPageCreate() {
                                                 className={`d-flex flex-column mb-3 ${style.imageUrlItem}`}
                                             >
                                                 <div className="d-flex align-items-center mb-2">
-                                                    <span
-                                                        className={`me-auto text-truncate ${style.imageUrlText}`}
-                                                        style={{ maxWidth: '80%' }}
-                                                    >
-                                                        {url}
-                                                    </span>
                                                     <Button
                                                         variant="outline-danger"
                                                         size="sm"

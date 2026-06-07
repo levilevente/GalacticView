@@ -6,7 +6,7 @@ from fastapi import HTTPException, Request
 
 load_dotenv()
 
-CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8001")
+CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8000")
 AUTH_REQUEST_TIMEOUT = 5.0
 
 

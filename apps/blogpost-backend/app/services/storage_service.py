@@ -5,6 +5,7 @@ from typing import BinaryIO
 from botocore.exceptions import ClientError
 
 from app.core.aws import s3_client
+from app.core.s3_setup import ensure_s3_bucket
 
 
 class ImagePromotionError(Exception):
@@ -22,11 +23,12 @@ class StorageService:
     def __init__(self) -> None:
         self.bucket_name = os.getenv("S3_BUCKET_NAME", "galactic-blog-images")
         self.s3_endpoint = os.getenv("S3_ENDPOINT")
+        self.s3_public_endpoint = os.getenv("S3_PUBLIC_ENDPOINT", self.s3_endpoint)
         self.aws_region = os.getenv("AWS_REGION", "eu-central-1")
 
     def _get_base_url(self) -> str:
-        if self.s3_endpoint:
-            return f"{self.s3_endpoint}/{self.bucket_name}"
+        if self.s3_public_endpoint:
+            return f"{self.s3_public_endpoint.rstrip('/')}/{self.bucket_name}"
         return f"https://{self.bucket_name}.s3.{self.aws_region}.amazonaws.com"
 
     def _object_exists(self, key: str) -> bool:
@@ -38,10 +40,18 @@ class StorageService:
                 return False
             raise
 
+    def _upload_extra_args(self, content_type: str) -> dict[str, str]:
+        extra_args: dict[str, str] = {"ContentType": content_type}
+        if not self.s3_endpoint:
+            extra_args["ACL"] = "public-read"
+        return extra_args
+
     def upload_image(self, file_obj: BinaryIO, original_filename: str, content_type: str) -> str:
         """
         Uploads an image to S3 under the "temp/" folder and returns its URL.
         """
+        ensure_s3_bucket()
+
         _, ext = os.path.splitext(original_filename)
         file_extension = ext.lstrip(".") or "bin"
         unique_filename = f"{uuid.uuid4()}.{file_extension}"
@@ -51,7 +61,7 @@ class StorageService:
             file_obj,
             self.bucket_name,
             s3_key,
-            ExtraArgs={"ContentType": content_type, "ACL": "public-read"}
+            ExtraArgs=self._upload_extra_args(content_type),
         )
 
         if not self._object_exists(s3_key):
@@ -101,12 +111,14 @@ class StorageService:
             )
 
         copy_source = {"Bucket": self.bucket_name, "Key": source_key}
-        s3_client.copy_object(
-            CopySource=copy_source,
-            Bucket=self.bucket_name,
-            Key=new_key,
-            ACL="public-read",
-        )
+        copy_args: dict[str, object] = {
+            "CopySource": copy_source,
+            "Bucket": self.bucket_name,
+            "Key": new_key,
+        }
+        if not self.s3_endpoint:
+            copy_args["ACL"] = "public-read"
+        s3_client.copy_object(**copy_args)
         s3_client.delete_object(Bucket=self.bucket_name, Key=source_key)
 
         return f"{self._get_base_url()}/{new_key}"

@@ -58,7 +58,7 @@ def main() -> None:
     reload = env == "dev"
     host = "0.0.0.0"
 
-    port = int(os.getenv("PORT", "8003"))
+    port = int(os.getenv("PORT", "8002"))
     logger.info(f"Starting agent server on {host}:{port} (reload={reload}, ENVIRONMENT={env})")
     uvicorn.run("server.serve:app", host=host, port=port, reload=reload)
 

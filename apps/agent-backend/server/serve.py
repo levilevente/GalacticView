@@ -1,16 +1,19 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-import uvicorn
-
 import os
 
-from .service import chat_ask_question
+from dotenv import load_dotenv
 
-from .dto import ChatTypeIn, ChatTypeOut
+load_dotenv()
 
+import uvicorn
+from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from .dependencies import require_auth
+from .dto import ChatTypeIn, ChatTypeOut
+from .service import chat_ask_question
 
 def get_real_ip(request: Request) -> str:
     """
@@ -31,9 +34,15 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # type: ignore
 
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,7 +51,11 @@ app.add_middleware(
 
 @app.post("/chat")
 @limiter.limit("7/minute")
-def chat_endpoint(request: Request, body: ChatTypeIn) -> ChatTypeOut:
+async def chat_endpoint(
+    request: Request,
+    body: ChatTypeIn,
+    _: None = Depends(require_auth),
+) -> ChatTypeOut:
     """
     Process chat questions using the agent and return structured responses.
     Rate limited to 7 requests per minute per IP.

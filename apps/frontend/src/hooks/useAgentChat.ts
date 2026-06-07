@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { sendPromptToAgent } from '../api/agent.api.ts';
+import { getApiErrorMessage } from '../utils/authUtils';
 
 export interface ChatMessage {
     id: string;
@@ -14,28 +15,10 @@ export interface ChatMessage {
     error?: string;
 }
 
-const SESSION_STORAGE_KEY = 'agent_chat_messages';
-
 const useAgentChat = () => {
-    const [messages, setMessages] = useState<ChatMessage[]>(() => {
-        try {
-            const storedMessages = sessionStorage.getItem(SESSION_STORAGE_KEY);
-            return storedMessages ? (JSON.parse(storedMessages) as ChatMessage[]) : [];
-        } catch (error) {
-            console.error('Failed to parse stored messages:', error);
-            return [];
-        }
-    });
-
-    useEffect(() => {
-        try {
-            sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(messages));
-        } catch (error) {
-            console.error('Failed to store messages:', error);
-        }
-    }, [messages]);
-
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [questionSent, setQuestionSent] = useState<boolean>(false);
 
     const sendMessage = async (msg: string) => {
         const userMessage: ChatMessage = {
@@ -44,7 +27,8 @@ const useAgentChat = () => {
             sender: 'user',
         };
 
-        setMessages((prev) => [...prev, userMessage]);
+        setMessages([userMessage]);
+        setQuestionSent(true);
         setIsLoading(true);
 
         try {
@@ -63,10 +47,10 @@ const useAgentChat = () => {
         } catch (error) {
             const errorMessage: ChatMessage = {
                 id: uuidv4(),
-                message: 'Sorry, there was an error processing your request.',
+                message: getApiErrorMessage(error, 'Sorry, there was an error processing your request.'),
                 sender: 'agent',
                 isError: true,
-                error: (error as Error).message,
+                error: getApiErrorMessage(error, 'Sorry, there was an error processing your request.'),
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
@@ -74,17 +58,11 @@ const useAgentChat = () => {
         }
     };
 
-    const clearChat = () => {
-        setMessages([]);
-        sessionStorage.removeItem(SESSION_STORAGE_KEY);
-        setIsLoading(false);
-    };
-
     return {
         messages,
         isLoading,
+        questionSent,
         sendMessage,
-        clearChat,
     };
 };
 

@@ -93,6 +93,12 @@
     padding: 0.75rem;
 }
 
+.authHint {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
 .inputGroup {
     position: relative;
 }

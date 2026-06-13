@@ -29,3 +29,6 @@ yarn-debug.log*
 yarn-error.log*
 .pytest_cache/
 __pycache__/
+
+# Secrets
+secrets/

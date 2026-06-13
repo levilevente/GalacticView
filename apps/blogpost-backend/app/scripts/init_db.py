@@ -30,15 +30,14 @@ def setup_s3():
     """
     bucket_name = os.getenv("S3_BUCKET_NAME", "galactic-blog-images")
     region = os.getenv("AWS_REGION", "eu-central-1")
-    
+
     try:
-        # AWS requires a specific LocationConstraint for regions outside us-east-1
         if region == "us-east-1":
             s3_client.create_bucket(Bucket=bucket_name)
         else:
             s3_client.create_bucket(
                 Bucket=bucket_name,
-                CreateBucketConfiguration={'LocationConstraint': region}
+                CreateBucketConfiguration={"LocationConstraint": region},
             )
         print(f"✅ S3 Bucket '{bucket_name}' created successfully!")
     except Exception as e:

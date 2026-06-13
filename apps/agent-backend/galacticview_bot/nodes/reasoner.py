@@ -1,4 +1,5 @@
 from groq import BadRequestError
+from langchain_core.messages import BaseMessage
 from loguru import logger
 
 from galacticview_bot.core.state import AgentState
@@ -17,7 +18,7 @@ def _is_tool_use_failed(error: BadRequestError) -> bool:
     return "tool_use_failed" in body
 
 
-def _invoke_with_tool_retry(messages):
+def _invoke_with_tool_retry(messages: list[BaseMessage]) -> BaseMessage:
     """Invoke the tool-enabled LLM, retrying with lower temperature on Groq tool_use_failed."""
     temperature = TOOL_TEMPERATURE
 

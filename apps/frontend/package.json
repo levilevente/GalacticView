@@ -52,5 +52,8 @@
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.46.4",
         "vite": "^7.1.7"
+    },
+    "resolutions": {
+        "esbuild": "^0.28.1"
     }
 }

@@ -1,0 +1,9 @@
+aws_region     = "eu-central-1"
+project_prefix = "galactic"
+environment    = "prod"
+
+db_username = "galactic_admin"
+db_name     = "galacticview"
+db_password = "change-me-to-a-strong-password"
+
+ssh_allowed_cidr = "0.0.0.0/0"

@@ -20,6 +20,7 @@ function LoginPage() {
 
         try {
             await login(email, password);
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             navigate('/');
         } catch (error) {
             console.error(error);

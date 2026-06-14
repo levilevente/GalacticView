@@ -1,6 +1,7 @@
 import os
 import uuid
 from typing import BinaryIO
+from urllib.parse import urlparse
 
 from botocore.exceptions import ClientError
 
@@ -41,9 +42,50 @@ class StorageService:
 
     def _upload_extra_args(self, content_type: str) -> dict[str, str]:
         extra_args: dict[str, str] = {"ContentType": content_type}
-        if not self.s3_endpoint:
+        if self.s3_endpoint:
             extra_args["ACL"] = "public-read"
         return extra_args
+
+    def _canonical_url(self, s3_key: str) -> str:
+        return f"{self._get_base_url()}/{s3_key}"
+
+    def _presign_url(self, s3_key: str, expires_in: int = 86400) -> str:
+        if self.s3_endpoint:
+            return self._canonical_url(s3_key)
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket_name, "Key": s3_key},
+            ExpiresIn=expires_in,
+        )
+
+    def presign_from_url(self, image_url: str, expires_in: int = 86400) -> str:
+        key = self._url_to_key(image_url)
+        return self._presign_url(key, expires_in=expires_in)
+
+    def _url_to_key(self, image_url: str) -> str:
+        url_without_query = image_url.split("?", 1)[0].rstrip("/")
+        parsed = urlparse(url_without_query)
+        host = parsed.netloc
+        path = parsed.path.lstrip("/")
+
+        if host.startswith("s3.") or host == "s3.amazonaws.com":
+            bucket, _, key = path.partition("/")
+            if bucket == self.bucket_name and key:
+                return key
+
+        if host.startswith(f"{self.bucket_name}."):
+            if path:
+                return path
+
+        if self.s3_public_endpoint:
+            localstack_host = urlparse(self.s3_public_endpoint.rstrip("/")).netloc
+            if host == localstack_host and path.startswith(f"{self.bucket_name}/"):
+                return path[len(self.bucket_name) + 1 :]
+
+        raise ImagePromotionError(
+            temp_image_url=image_url,
+            message="Unrecognized image URL — only uploaded images are accepted.",
+        )
 
     def upload_image(self, file_obj: BinaryIO, original_filename: str, content_type: str) -> str:
         """
@@ -67,24 +109,17 @@ class StorageService:
                 message="Image upload did not persist in storage. Please try again.",
             )
 
-        return f"{self._get_base_url()}/{s3_key}"
+        return self._presign_url(s3_key)
 
     def promote_image(self, temp_image_url: str) -> str:
         """
         Moves an image from temp/ to published/ and returns the new URL.
         All URLs are guaranteed to come from our own upload endpoint.
         """
-        base = f"{self._get_base_url()}/"
-        if not temp_image_url.startswith(base):
-            raise ImagePromotionError(
-                temp_image_url=temp_image_url,
-                message="Unrecognized image URL — only uploaded images are accepted.",
-            )
-
-        source_key = temp_image_url[len(base):]
+        source_key = self._url_to_key(temp_image_url)
 
         if source_key.startswith("published/"):
-            return temp_image_url
+            return self._canonical_url(source_key)
 
         if not source_key.startswith("temp/"):
             raise ImagePromotionError(
@@ -96,7 +131,7 @@ class StorageService:
         new_key = f"published/{filename}"
 
         if self._object_exists(new_key):
-            return f"{self._get_base_url()}/{new_key}"
+            return self._canonical_url(new_key)
 
         if not self._object_exists(source_key):
             raise ImagePromotionError(
@@ -113,9 +148,9 @@ class StorageService:
             "Bucket": self.bucket_name,
             "Key": new_key,
         }
-        if not self.s3_endpoint:
+        if self.s3_endpoint:
             copy_args["ACL"] = "public-read"
         s3_client.copy_object(**copy_args)
         s3_client.delete_object(Bucket=self.bucket_name, Key=source_key)
 
-        return f"{self._get_base_url()}/{new_key}"
+        return self._canonical_url(new_key)

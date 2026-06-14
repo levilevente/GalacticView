@@ -16,10 +16,11 @@ function LoginPage() {
 
     const onSubmitHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError('');
 
         try {
             await login(email, password);
-            await navigate('/');
+            navigate('/');
         } catch (error) {
             console.error(error);
             setError(error instanceof Error ? error.message : 'Login failed. Please try again.');

@@ -20,8 +20,7 @@ function LoginPage() {
 
         try {
             await login(email, password);
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            navigate('/');
+            await navigate('/');
         } catch (error) {
             console.error(error);
             setError(error instanceof Error ? error.message : 'Login failed. Please try again.');

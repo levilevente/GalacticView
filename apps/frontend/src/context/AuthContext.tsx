@@ -54,10 +54,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const response = await sendLoginRequest(userCredential);
-            if (response.status !== 'success' || !response.user) {
+            if (response.status !== 'success') {
                 throw new Error(response.message || 'Login failed.');
             }
-            setUser(response.user);
+            await refreshUser();
         } catch (error) {
             try {
                 await signOut(auth);

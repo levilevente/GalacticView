@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-service
+  template:
+    metadata:
+      labels:
+        app: agent-service
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: agent-service
+          image: leventedaroczi/galactic-private:agent-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002
+          env:
+            - name: ENVIRONMENT
+              value: "prod"
+            - name: LOGGING_LEVEL
+              value: "INFO"
+            - name: CORE_BACKEND_URL
+              value: "http://auth-service"
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: galactic-secrets
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: galactic-secrets
+                  key: TAVILY_API_KEY
+                  optional: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-service
+spec:
+  selector:
+    app: agent-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8002

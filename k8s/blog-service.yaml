@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog-service
+  template:
+    metadata:
+      labels:
+        app: blog-service
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: blog-service
+          image: leventedaroczi/galactic-private:blog-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+          env:
+            - name: AWS_REGION
+              value: "eu-central-1"
+            - name: S3_BUCKET_NAME
+              value: "galactic-blog-images-a54ebf00"
+            - name: DYNAMODB_TABLE_NAME
+              value: "GalacticBlogPosts"
+            - name: CORE_BACKEND_URL
+              value: "http://auth-service"
+            
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: galactic-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: galactic-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-service
+spec:
+  selector:
+    app: blog-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8001

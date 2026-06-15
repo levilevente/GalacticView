@@ -1,7 +1,7 @@
 import os
 
 import uvicorn
-from fastapi import Depends, FastAPI, Request
+from fastapi import APIRouter, Depends, FastAPI, Request
 from loguru import logger
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -33,7 +33,10 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # typ
 add_cors_middleware(app)
 
 
-@app.post("/chat")
+agent_router = APIRouter(prefix="/agent", tags=["agent"])
+
+
+@agent_router.post("/chat")
 @limiter.limit("7/minute")
 def chat_endpoint(
     request: Request,
@@ -44,10 +47,13 @@ def chat_endpoint(
     Process chat questions using the agent and return structured responses.
     Rate limited to 7 requests per minute per IP.
     """
-    logger.info("Received request to /chat endpoint")
+    logger.info("Received request to /agent/chat endpoint")
     response_data: ChatTypeOut = chat_ask_question(body)
     logger.info("Sending response back to client")
     return response_data
+
+
+app.include_router(agent_router)
 
 def main() -> None:
     """

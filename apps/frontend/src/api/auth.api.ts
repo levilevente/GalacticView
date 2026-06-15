@@ -25,14 +25,18 @@ export const coreAPI = axios.create({
     withCredentials: true,
 });
 
+const AUTH_FLOW_ENDPOINTS = new Set(['/auth/login', '/auth/register', '/auth/logout', '/auth/me']);
+
 coreAPI.interceptors.response.use(
     (response) => {
         return response;
     },
     async (error: AxiosError) => {
         const originalRequest = error.config;
+        const requestUrl = originalRequest?.url ?? '';
+        const isAuthFlowRequest = AUTH_FLOW_ENDPOINTS.has(requestUrl);
 
-        if (error.response?.status === 401 && originalRequest?.url !== '/auth/me') {
+        if (error.response?.status === 401 && !isAuthFlowRequest) {
             console.warn('Session expired. Logging out...');
             try {
                 await coreAPI.post('/auth/logout');

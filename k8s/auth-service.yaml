@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: auth-service
+          image: leventedaroczi/galactic-private:auth-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POSTGRESQL_HOST
+              value: "galactic-prod-postgres.ctu6e660itca.eu-central-1.rds.amazonaws.com"
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_DB
+              value: "galacticview"
+            - name: POSTGRESQL_USER
+              value: "galactic_admin"
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: galactic-secrets
+                  key: POSTGRESQL_PASSWORD
+            - name: ENVIRONMENT
+              value: "prod"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /run/secrets/firebase/firebase-service-account.json
+          volumeMounts:
+            - name: firebase-credentials
+              mountPath: /run/secrets/firebase
+              readOnly: true
+      volumes:
+        - name: firebase-credentials
+          secret:
+            secretName: firebase-credentials
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000

@@ -53,9 +53,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleLogin: AuthContextType['login'] = async (email, password) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            await sendLoginRequest(userCredential);
+            const response = await sendLoginRequest(userCredential);
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'Login failed.');
+            }
             await refreshUser();
         } catch (error) {
+            try {
+                await signOut(auth);
+            } catch (signOutError) {
+                console.warn('Failed signing out firebase after login failure:', signOutError);
+            }
             throw new Error(getApiErrorMessage(error, 'Login failed.'));
         }
     };

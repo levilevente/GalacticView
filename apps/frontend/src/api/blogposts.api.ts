@@ -17,12 +17,12 @@ export const blogPostsApi = axios.create({
 });
 
 export async function getAllBlogPosts(): Promise<BlogPostTypeIn[]> {
-    const res = await blogPostsApi.get<BlogPostTypeIn[]>('/blogs');
+    const res = await blogPostsApi.get<BlogPostTypeIn[]>('/blogs/');
     return res.data;
 }
 
 export async function createBlogPosts(newBlogPost: BlogPostTypeOut): Promise<BlogPostTypeIn> {
-    const res = await blogPostsApi.post<BlogPostTypeIn>('/blogs', newBlogPost);
+    const res = await blogPostsApi.post<BlogPostTypeIn>('/blogs/', newBlogPost);
     return res.data;
 }
 

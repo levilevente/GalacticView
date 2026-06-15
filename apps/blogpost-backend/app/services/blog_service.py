@@ -36,7 +36,13 @@ class BlogService:
         """
         Fetches all blog posts from the repository.
         """
-        return self.repo.get_all_posts()
+        posts = self.repo.get_all_posts()
+        for post in posts:
+            post["image_urls"] = [
+                self.storage_service.presign_from_url(url)
+                for url in post.get("image_urls", [])
+            ]
+        return posts
 
     def delete_blog(self, blog_id: str, requesting_author: str) -> dict:
         """

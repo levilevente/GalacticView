@@ -3,7 +3,7 @@ import os
 import httpx
 from fastapi import Request, HTTPException
 
-CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8001")
+CORE_BACKEND_URL = os.getenv("CORE_BACKEND_URL", "http://localhost:8000")
 
 
 async def _verify_session(session_cookie: str) -> dict:

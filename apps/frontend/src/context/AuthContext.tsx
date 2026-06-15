@@ -53,21 +53,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleLogin: AuthContextType['login'] = async (email, password) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            await sendLoginRequest(userCredential);
+            const response = await sendLoginRequest(userCredential);
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'Login failed.');
+            }
             await refreshUser();
         } catch (error) {
+            try {
+                await signOut(auth);
+            } catch (signOutError) {
+                console.warn('Failed signing out firebase after login failure:', signOutError);
+            }
             throw new Error(getApiErrorMessage(error, 'Login failed.'));
         }
     };
 
     const handleRegister: AuthContextType['register'] = async (email, password, username, firstName, lastName) => {
+        let createdFirebaseUser = false;
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            let userCredential;
+            try {
+                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                createdFirebaseUser = true;
+            } catch (error) {
+                const code = (error as { code?: string }).code;
+                if (code === 'auth/email-already-in-use') {
+                    userCredential = await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    throw error;
+                }
+            }
             await sendRegisterRequest(userCredential, username, firstName, lastName);
             await refreshUser();
         } catch (error) {
             console.error('Error during registration:', error);
-            if (auth.currentUser) {
+            if (createdFirebaseUser && auth.currentUser) {
                 try {
                     await auth.currentUser.delete();
                 } catch (e) {

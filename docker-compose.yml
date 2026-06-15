@@ -1,0 +1,122 @@
+services:
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - galactic-network
+    depends_on:
+      - auth-service
+      - blog-service
+      - agent-service
+
+  auth-service:
+    build:
+      context: ./apps/core-backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./apps/core-backend/.env
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: prod
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      POSTGRESQL_HOST: postgres
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-service-account.json
+    volumes:
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
+    networks:
+      - galactic-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  blog-service:
+    build:
+      context: ./apps/blogpost-backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./apps/blogpost-backend/.env
+    ports:
+      - "8001:8001"
+    environment:
+      ENVIRONMENT: prod
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      DYNAMODB_ENDPOINT: http://localstack:4566
+      S3_ENDPOINT: http://localstack:4566
+      S3_PUBLIC_ENDPOINT: http://localhost:4566
+      CORE_BACKEND_URL: http://auth-service:8000
+    networks:
+      - galactic-network
+    depends_on:
+      localstack:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  agent-service:
+    build:
+      context: ./apps/agent-backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./apps/agent-backend/.env
+    ports:
+      - "8002:8002"
+    environment:
+      ENVIRONMENT: prod
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      PORT: "8002"
+      CORE_BACKEND_URL: http://auth-service:8000
+    networks:
+      - galactic-network
+    depends_on:
+      auth-service:
+        condition: service_started
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: galactic
+      POSTGRES_PASSWORD: galactic
+      POSTGRES_DB: galacticview
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - galactic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U galactic -d galacticview"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  localstack:
+    image: localstack/localstack:3.8.0
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,dynamodb
+      DEBUG: "0"
+      AWS_DEFAULT_REGION: eu-central-1
+    volumes:
+      - localstack-data:/var/lib/localstack
+    networks:
+      - galactic-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+networks:
+  galactic-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  localstack-data:

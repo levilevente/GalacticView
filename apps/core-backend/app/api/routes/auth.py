@@ -42,7 +42,8 @@ async def register(
         max_age=cookie_data["expires"],
         httponly=True,
         samesite="lax",
-        secure=False # True in production
+        secure=False,  # True in production
+        path="/",
     )
     return {"status": "success", "message": "Registered and logged in"}
 
@@ -58,8 +59,13 @@ async def login(
     cookie_data = service.login_user(request.id_token)
     
     response.set_cookie(
-        key="session", value=cookie_data["cookie"], max_age=cookie_data["expires"],
-        httponly=True, samesite="lax", secure=False
+        key="session",
+        value=cookie_data["cookie"],
+        max_age=cookie_data["expires"],
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        path="/",
     )
     return {"status": "success", "message": "Login successful"}
 
@@ -69,7 +75,7 @@ async def logout(response: Response) -> dict[str, str]:
     """
     Clear the session cookie to log the user out.
     """
-    response.delete_cookie(key="session")
+    response.delete_cookie(key="session", path="/")
     return {"status": "success", "message": "Logout successful"}
 
 

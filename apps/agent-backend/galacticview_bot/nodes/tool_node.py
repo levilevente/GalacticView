@@ -4,7 +4,7 @@ from langchain_core.messages import ToolMessage
 from galacticview_bot.core.state import AgentState
 from galacticview_bot.tools.search import tavily_search_tool
 
-tools = [tavily_search_tool]
+tools = [tool for tool in [tavily_search_tool] if tool is not None]
 
 def custom_tool_node(state: AgentState) -> dict:
     """

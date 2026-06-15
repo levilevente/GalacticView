@@ -10,6 +10,8 @@ load_dotenv()
 class TavilyInput(BaseModel):
     query: str = Field(description="The search query to find information on the internet.")
 
+tavily_search_tool = None
+
 if os.getenv("TAVILY_API_KEY"):
     logger.info("TAVILY_API_KEY found. Initializing Tavily search tool.")
     tavily_search_tool = TavilySearch(

@@ -43,8 +43,20 @@ class AuthService:
 
     def login_user(self, id_token: str) -> dict[str, Any]:
         """
-        Creates cookie on login
+        Verify the Firebase token, ensure the user exists in PostgreSQL, then mint a session cookie.
         """
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            uid = decoded_token["uid"]
+        except Exception:
+            raise HTTPException(status_code=401, detail="Invalid Firebase Token")
+
+        if not self.user_repo.get_user_by_id(uid):
+            raise HTTPException(
+                status_code=404,
+                detail="User not found. Complete registration to create your profile.",
+            )
+
         return self._create_cookie(id_token)
     
     def get_user_by_id(self, user_id: str) -> User:

@@ -11,16 +11,30 @@ load_dotenv()
 
 app = FastAPI(title="GalacticView Blog Content Service")
 
-ALLOWED_ORIGINS = [o.strip() 
-                    for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
+_DEV_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+_DEFAULT_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS, 
-    allow_credentials=True,                  
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if os.getenv("ENVIRONMENT", "prod") == "dev":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=_DEV_ORIGIN_REGEX,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    allowed_origins = [
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", _DEFAULT_ORIGINS).split(",")
+        if origin.strip()
+    ]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 @app.get("/health", tags=["System"])
 def health_check() -> dict[str, str]:

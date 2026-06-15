@@ -17,11 +17,9 @@ if DYNAMODB_ENDPOINT:
 dynamodb = boto3.resource('dynamodb', **dynamodb_args)
 
 # Configure the S3 client (for future image uploads)
-s3_args = {
-    "region_name": AWS_REGION,
-    "config": Config(s3={'addressing_style': 'path'}) # Forces LocalStack compatibility
-}
+s3_args: dict[str, object] = {"region_name": AWS_REGION}
 if S3_ENDPOINT:
-    s3_args["endpoint_url"] = S3_ENDPOINT # Route traffic to LocalStack!
+    s3_args["endpoint_url"] = S3_ENDPOINT
+    s3_args["config"] = Config(s3={"addressing_style": "path"})
 
-s3_client = boto3.client('s3', **s3_args)
+s3_client = boto3.client("s3", **s3_args)

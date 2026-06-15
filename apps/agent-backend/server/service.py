@@ -6,6 +6,8 @@ from loguru import logger
 from langchain_core.messages import HumanMessage
 
 import json
+import uuid
+
 
 def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     """
@@ -20,8 +22,7 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     }
 
     try:
-        # Hardcoded to a single thread ID to maintain context across all requests for initial testing.
-        thread_id = "initial-single-context-thread"
+        thread_id = str(uuid.uuid4())
 
         config = {
             "configurable": {"thread_id": thread_id},

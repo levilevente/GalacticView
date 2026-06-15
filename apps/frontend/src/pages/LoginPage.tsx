@@ -16,6 +16,7 @@ function LoginPage() {
 
     const onSubmitHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError('');
 
         try {
             await login(email, password);

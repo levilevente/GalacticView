@@ -112,7 +112,9 @@
   },
   "agent": {
     "welcome": "\uD83D\uDC4B How can I help you explore the cosmos today?",
-    "placeholder": "Ask me anything about space..."
+    "placeholder": "Ask me anything about space...",
+    "loginRequired": "Please log in to ask the Galactic Agent.",
+    "oneQuestionOnly": "Refresh the page to ask a new question."
   },
   "loading": "Loading..."
 }

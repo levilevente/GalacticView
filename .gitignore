@@ -36,3 +36,4 @@ secrets/
 .idea/
 
 k8s/secrets.yaml
+.vscode/

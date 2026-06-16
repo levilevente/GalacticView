@@ -1,89 +1,140 @@
-# 🌌 GalacticView
+# GalacticView
 
-![Monorepo](https://img.shields.io/badge/Monorepo-Workspace-blueviolet?style=for-the-badge)
-![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)
-
-> A comprehensive platform for exploring the cosmos, fueled by **NASA Open APIs** and **AI**, designed to bring the universe closer to you.
-
-Welcome to the **GalacticView** monorepo! This repository houses the entire ecosystem for the GalacticView application, organizing all frontend and backend services in one place.
+A microservices platform for exploring the cosmos — NASA Open APIs, community blog posts, and an AI astronomy assistant — deployed on **AWS + k3s**.
 
 ---
 
-## 📖 Overview
+## Architecture
 
-GalacticView makes astronomical data accessible and visually stunning. It combines high-quality space imagery and data from NASA with a highly capable AI assistant that can answer complicated questions about the universe.
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Browser                                                     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ http://<EC2_IP>/
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  k3s on EC2 (Traefik Ingress)                                │
+│  ┌─────────────────────┐  ┌──────────────────────────────┐  │
+│  │ frontend-ui-ingress │  │ backend-api-ingress          │  │
+│  │   /  → frontend     │  │   /auth  → auth-service    │  │
+│  └─────────────────────┘  │   /blogs → blog-service    │  │
+│                           │   /agent → agent-service   │  │
+│                           └──────────────────────────────┘  │
+└──────────┬──────────────────────┬──────────────────────────┘
+           │                      │
+    ┌──────▼──────┐        ┌──────▼──────┐        ┌───────────┐
+    │  frontend   │        │ auth-service│        │blog-service│
+    │  (React)    │        │  (FastAPI)  │        │ (FastAPI) │
+    └─────────────┘        └──────┬──────┘        └─────┬─────┘
+                                  │                     │
+                           ┌──────▼──────┐       ┌──────▼──────┐
+                           │ RDS Postgres│       │ DynamoDB+S3 │
+                           └─────────────┘       └─────────────┘
 
-This repository is structured as a monorepo containing multiple interconnected applications under the `apps/` directory.
+    ┌─────────────┐
+    │agent-service│  ← Groq + Tavily (no own database)
+    │  (FastAPI)  │
+    └─────────────┘
+```
+
+### Microservices (`apps/`)
+
+| Service | Directory | Port | Database | Responsibility |
+|---|---|---|---|---|
+| Frontend | `apps/frontend` | 80 | — | React SPA, NASA data UI, chat widget |
+| Auth | `apps/core-backend` | 8000 | PostgreSQL | User registration, login, sessions (Firebase) |
+| Blog | `apps/blogpost-backend` | 8001 | DynamoDB + S3 | Blog posts and image uploads |
+| Agent | `apps/agent-backend` | 8002 | — | AI chat (Groq, LangGraph, Tavily) |
+
+Each backend service has its own Dockerfile, Poetry dependencies, and `.env.example`.
 
 ---
 
-## 🏗️ Architecture & Apps
+## Quick start — local (Docker Compose)
 
-### 1. 🖥 Frontend (`apps/frontend`)
-
-A modern, sleek web visualizer built with **React**, **TypeScript**, and **Vite**.
-
-- Fetches and displays real-time astronomical data from NASA APIs (such as APOD, EPIC, and the NASA Image and Video Library).
-- Provides the main user interface and chat widget for interacting with the AI agent.
-- **[Read the Frontend Setup Guide & README](./apps/frontend/README.md)**
-
-### 2. 🤖 AI Agent Backend (`apps/backend`)
-
-An intelligent service powered by **Groq**, **LangGraph**, and **FastAPI**.
-
-- Exposes a REST API to handle space-related queries from the frontend.
-- Uses the **Tavily** search API to supplement the AI's knowledge with real-time astronomy facts.
-- **[Read the Agent Backend Setup Guide & README](./apps/backend/README.md)**
-
----
-
-## 🔮 Future Roadmap
-
-GalacticView is continuously evolving. Our next major step towards becoming a full-stack community platform includes adding user-generated content features:
-
-- [] **Community Platform Backend:** A planned _second_ backend application (technology stack TBD) that will be added to this monorepo. This microservice will be dedicated to managing **User Posts**, allowing community members to publish blogs, leave comments, and share their astronomy experiences directly on GalacticView.
-
----
-
-## 🚀 Getting Started
-
-To run the full stack locally, you will need to set up both the frontend client and the AI backend service.
+The fastest way to run the full stack on your machine without AWS or Kubernetes.
 
 ### Prerequisites
 
-- **Node.js** (v16+) and **npm/yarn** for the frontend.
-- **Python** (v3.12+) and **Poetry** for the agent backend.
-- API Keys for **NASA**, **Groq**, and **Tavily**.
+- Docker and Docker Compose
+- Copy `.env.example` → `.env` in each app directory (see below)
+- Place Firebase service account JSON at `secrets/firebase-service-account.json`
 
-### 1. Start the Backend Agent
-
-Navigate to the backend directory, install the Python dependencies using Poetry, and run the FastAPI server:
+### Environment files
 
 ```bash
-cd apps/backend
-poetry install
-
-# Be sure to set up your .env file in apps/backend first!
-# GROQ_API_KEY=... / TAVILY_API_KEY=...
-poetry run galacticview_app
+cp apps/core-backend/.env.example    apps/core-backend/.env
+cp apps/blogpost-backend/.env.example apps/blogpost-backend/.env
+cp apps/agent-backend/.env.example    apps/agent-backend/.env
+cp apps/frontend/.env.example         apps/frontend/.env
 ```
 
-### 2. Start the Frontend
+Fill in API keys: NASA, Groq, Tavily (optional), Firebase.
 
-In a new terminal window, navigate to the frontend directory, install the Node dependencies, and start the Vite development server:
+### Run
 
 ```bash
-cd apps/frontend
-npm install
-
-# Be sure to set up your .env file in apps/frontend first!
-# VITE_NASA_API_KEY=...
-npm run dev
+docker compose up --build
 ```
+
+Open **http://localhost:8080**
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:8080 |
+| Auth API | http://localhost:8000 |
+| Blog API | http://localhost:8001 |
+| Agent API | http://localhost:8002 |
+
+Local databases: PostgreSQL (auth) and LocalStack (DynamoDB + S3 for blog) run inside Compose — no AWS account needed.
 
 ---
 
-## 📄 License
+## Cloud deployment (reproducible)
 
-This project incorporates multiple applications, each with their respective licenses. Please refer to `apps/frontend/LICENSE` and `apps/backend/LICENSE` for more information.
+Full cloud reproduction from this repository:
+
+1. **[`terraform/README.md`](terraform/README.md)** — Provision AWS (VPC, EC2/k3s, RDS, DynamoDB, S3)
+2. **[`k8s/README.md`](k8s/README.md)** — Build images, create secrets, deploy manifests
+
+### What you must provide locally (never in git)
+
+| Secret / credential | Where to set it |
+|---|---|
+| AWS credentials | `aws configure` or env vars |
+| `db_password` | `terraform/terraform.tfvars` |
+| PostgreSQL password | `k8s/secrets.yaml` (same as `db_password`) |
+| AWS IAM keys (blog S3/DynamoDB) | `k8s/secrets.yaml` |
+| Groq / Tavily API keys | `k8s/secrets.yaml` |
+| Firebase service account | `kubectl create secret` + `secrets/firebase-service-account.json` |
+| Docker Hub token | `kubectl create secret docker-registry` |
+
+### Tracked reproducibility files
+
+| Path | Purpose |
+|---|---|
+| `docker-compose.yml` | Local full-stack |
+| `terraform/*.tf` + `terraform.tfvars.example` | AWS infrastructure |
+| `k8s/*.yaml` + `k8s/secrets.example.yaml` | Kubernetes workloads |
+| `apps/*/.env.example` | Per-app local configuration templates |
+
+---
+
+## Per-app documentation
+
+- [Frontend](./apps/frontend/README.md)
+- [Agent service](./apps/agent-backend/README.md)
+
+Each backend app also has a `.env.example` in its directory for local configuration.
+
+---
+
+## CI
+
+GitHub Actions workflows under `.github/workflows/` run linting and tests per service on push.
+
+---
+
+## License
+
+See `apps/frontend/LICENSE`, `apps/core-backend/LICENSE`, and `apps/blogpost-backend/LICENSE`.
